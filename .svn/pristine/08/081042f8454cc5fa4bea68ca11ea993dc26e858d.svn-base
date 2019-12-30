@@ -1,0 +1,518 @@
+<!-- 
+  @author:zhengrong
+  @data:2018年12月17日20:24:13
+-->
+<template>
+  <div class="doc_list">
+    <!-- 导航栏选择 -->
+    <div class="doc_nav">
+      <div class="navbar">
+        <div class="firstitem">
+          方向：
+        </div>
+        <div class="lastitem">
+          <a href="#"  class="item active" @click="hanlderChoose({name:'全部'})">全部</a>
+          <a class="item" v-for="item in direction" @click="hanlderChoose(item,0)" :key="item.id">{{item.name}}</a>
+        </div>
+      </div>
+      <div class="navbar">
+        <div class="firstitem">
+          技术：
+        </div>
+        <div class="lastitem">
+          <a href="#" class="item active" @click="hanlderChoose({name:'全部'})">全部</a>  
+          <a class="item" v-for="item in technology" @click="hanlderChoose(item,1)" :key="item.id">{{item.name}}</a>
+        </div>
+      </div>
+      <div class="navbar">
+        <div class="firstitem">
+          类型：
+        </div>
+        <div class="lastitem">
+          <a href="#" class="item active" @click="hanlderChoose({name:'全部'})">全部</a>  
+          <a class="item" v-for="item in type" @click="hanlderChoose(item,2)" :key="item.id">{{item.name}}</a>
+        </div>
+      </div>
+      <div class="navbar">
+        <div class="firstitem">
+          权限：
+        </div>
+        <div class="lastitem">
+          <a href="#" class="item active" @click="hanlderChoose({name:'全部'})">全部</a>  
+          <a class="item" v-for="item in permissions" @click="hanlderChoose(item,3)" :key="item.id">{{item.name}}</a>
+        </div>
+      </div>
+       <div class="navbar">
+        <div class="firstitem">
+          格式：
+        </div>
+        <div class="lastitem">
+          <a href="#" class="item active" @click="hanlderChoose({name:'全部'})">全部</a>  
+          <a class="item" v-for="item in format" @click="hanlderChoose(item,4)" :key="item.id">{{item.name}}</a>
+        </div>
+      </div>
+      <div class="navbar">
+        <div class="firstitem like">
+          您可能喜欢：
+        </div>
+        <div class="lastitem last-item">
+          <span class="item" v-for="item in teachers" :key="item.id">{{item.name}}</span>
+        </div>
+      </div>
+      <div class="navbar">
+        <div class="firstitem like">
+          已选条件：
+        </div>
+        <div class="lastitem">
+          <div class="condition" v-show="select.direction.name!=='全部'&&select.direction.name!==''">
+            {{select.direction.name}}
+            <img class="closeicon" src="https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/u681.png" alt="u681.png">
+          </div>
+          <div class="condition" v-show="select.technology.name!=='全部'&&select.technology.name!==''">
+           {{select.technology.name}}
+           <img class="closeicon" src="https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/u681.png" alt="u681.png">
+         </div>
+         <div class="condition" v-show="select.type.name!=='全部'&&select.type.name!==''">
+           {{select.type.name}}
+           <img class="closeicon" src="https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/u681.png" alt="u681.png">
+         </div>
+         <div class="condition" v-show="select.power.name!=='全部'&&select.power.name!==''">
+           {{select.power.name}}
+           <img class="closeicon" src="https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/u681.png" alt="u681.png">
+         </div>
+         <div class="condition" v-show="select.format.name!=='全部'&&select.format.name!==''">
+           {{select.format.name}}
+           <img class="closeicon" src="https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/u681.png" alt="u681.png">
+         </div>
+        </div>
+      </div>
+    </div>
+    <!-- 排序 -->
+    <div class="doclist_check">
+      <span class="order">排序:</span>
+      <label for="time">
+        <input id="time" type="checkbox" name='time' v-model="select.time">
+        更新时间
+      </label>
+      <label for="time">
+        <input id="time" type="checkbox" name="hot" v-model="select.hot">
+        热度
+      </label>
+    </div>
+    <!-- 文章 -->
+    <div class="list">
+      <div class="list-item" v-for="item in list" :key="item.id">
+        <div class="list-content">
+          <div class="list-item-title">
+            <span class="icon"><i class="fa fa-file-pdf-o"></i></span>
+            <a href="javascript:viod(0)">
+              <router-link target="_blank" to="/doc/content">{{item.title}}</router-link>
+            </a>
+            <span class="list-item-title-good">
+              <span style="font-size:10px;"><i class="fa fa-thumbs-up" style="font-size:12px;"></i>{{item.goodNum}}</span>
+            </span>
+          </div>
+          <div class="list-item-art">
+            <p>{{item.text}}</p>
+          </div>
+          <div class="list-item-info">
+            <span>{{item.data}}</span>|
+            <span>共{{item.pages}}页</span>|
+            <span>{{item.collect}}人收藏</span>|
+            <span>作者：{{item.author}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 分页 -->
+    <div class="page">
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :total="1000">
+      </el-pagination>
+    </div>
+  </div>
+</template>
+<script>
+  export default{
+    data(){
+      return {
+        // 模拟数据
+        direction:[{
+            id:1,
+            name:'JAVA'
+          },{
+            id:2,
+            name:'WEB全栈开发'
+          },{
+            id:3,
+            name:'Python人工智能'
+          },{
+            id:4,
+            name:'.NET'
+          },{
+            id:5,
+            name:'C++'
+          },{
+            id:6,
+            name:'C#'
+          },{
+            id:7,
+            name:'PHP'
+          },{
+            id:8,
+            name:'SQL'
+          },{
+            id:9,
+            name:'Objective-C'
+          },{
+            id:10,
+            name:'Go'
+          },{
+            id:11,
+            name:'SQL'
+          },{
+            id:12,
+            name:'Ruby'
+          },{
+            id:13,
+            name:'Swift'
+          },{
+            id:14,
+            name:'C'
+          },{
+            id:14,
+            name:'R'
+          },{
+            id:14,
+            name:'D'
+          },{
+            id:14,
+            name:'C'
+          }],
+        technology:[{
+            id:1,
+            name:'HTML'
+          },{
+            id:2,
+            name:'CSS'
+          },{
+            id:3,
+            name:'JavaScript'
+          }],
+        type:[{
+            id:1,
+            name:'杰普教程'
+          },{
+            id:2,
+            name:'网络资源'
+          }],
+        permissions:[{
+            id:1,
+            name:'公开'
+          },{
+            id:2,
+            name:'私有'
+          }],
+        format:[{
+            id:1,
+            name:'PDF'
+          },{
+            id:2,
+            name:'PPT'
+          },{
+            id:3,
+            name:'Word'
+          },{
+            id:4,
+            name:'txt'
+          }],
+        teachers:[{
+            id:1,
+            name:'任青松'
+          },{
+            id:2,
+            name:'李春雨'
+          },{
+            id:3,
+            name:'丁长明'
+          }],
+        // 筛选条件
+        select:{
+          direction:{
+            id:'',
+            name:''
+          },
+          technology:{
+            id:'',
+            name:''
+          },
+          type:{
+            id:'',
+            name:''
+          },
+          power:{
+            id:'',
+            name:''
+          },
+          format:{
+            id:'',
+            name:''
+          },
+          time:true,
+          hot:true
+        },
+        list:[{
+          id:1,
+          title:'JAVA修炼手册-初级宝典',
+          goodNum:'33',
+          text:'Java语言基础 - Java语言基础(第一讲) ? ? ? ? ? ? Java语言简介 面向对象的概念 java面向对象程序设计的特点 类,包,接口 JAVA的开发环境 E......',
+          data:'2018-11-27',
+          pages:'15',
+          collect:'8',
+          author:'朱莉',
+        },{
+          id:2,
+          title:'JAVA修炼手册-中级宝典',
+          goodNum:'888',
+          text:'Java语言基础 - Java语言基础(第二讲) ? ? ? ? ? ? Java语言简介 面向对象的概念 java面向对象程序设计的特点 类,包,接口 JAVA的开发环境 E......',
+          data:'2018-11-27',
+          pages:'17',
+          collect:'0',
+          author:'罗密',
+        },{
+          id:3,
+          title:'JAVA修炼手册-高级宝典',
+          goodNum:'0',
+          text:'Java语言基础 - Java语言基础(第一百零八讲) ? ? ? ? ? ? Java语言简介 面向对象的概念 java面向对象程序设计的特点 类,包,接口 JAVA的开发环境 E......',
+          data:'2018-11-27',
+          pages:'1400',
+          collect:'800',
+          author:'朱莉',
+        },{
+          id:4,
+          title:'JAVA修炼手册-超级宝典',
+          goodNum:'999+',
+          text:'Java语言基础 - Java语言基础(第一九百九十九讲) ? ? ? ? ? ? Java语言简介 面向对象的概念 java面向对象程序设计的特点 类,包,接口 JAVA的开发环境 E......',
+          data:'2018-11-27',
+          pages:'1',
+          collect:'8',
+          author:'罗密',
+        },{
+          id:5,
+          title:'JAVA修炼手册-神级宝典',
+          goodNum:'999+',
+          text:'Java语言基础 - Java语言基础(第一千零一讲) ? ? ? ? ? ? JAVA语言简介 如何如何学习java ',
+          data:'2018-11-27',
+          pages:'199',
+          collect:'999+',
+          author:'朱莉',
+        }]
+      }
+    },
+    mounted(){
+      $(function(){
+        $(".doc_list a.item").click(function(e){
+          $(this).addClass('active').siblings().removeClass('active');
+        })
+      })
+    },
+    methods:{
+      hanlderChoose(item,n){
+        switch(n){
+          case 0:
+            this.select.direction = item;
+            break;
+          case 1:
+            this.select.technology = item;
+            break;
+          case 2:
+            this.select.type = item;
+            break;
+          case 3:
+            this.select.power = item;
+            break;
+          case 4:
+            this.select.format = item;
+            break;
+        }
+      }
+    }
+  }
+</script>
+<style scope>
+  .doc_list{
+    width:1240px;
+    margin:0 auto;
+  }
+  /*导航样式*/
+  .doc_list .doc_nav{
+    padding:0px 20px 0px;
+    width:1198px;
+    margin:40px 0;
+    border:1px solid rgb(215,215,215);
+  }
+  .doc_list .doc_nav .navbar{
+    border-bottom: 1px dashed rgb(215,215,215);
+  }
+  .doc_list .doc_nav .navbar:last-child{
+    border-bottom: none;
+    height: 40px;
+  }
+  .doc_list .doc_nav .navbar .firstitem{
+    font-family: '微软雅黑 Bold', '微软雅黑 Regular', '微软雅黑';
+    font-weight: 700;
+    color: #949494;
+    width: 46px;
+    height: 24px;
+    float: left;
+    margin:8px 0px;
+  }
+  .doc_list .doc_nav .navbar .lastitem{
+    margin:0px 0px 0px 46px;
+    width: 1150px;
+  }
+  .doc_list .doc_nav .navbar .last-item{
+    margin:0px 0px 0px 46px;
+    width: 1096px;
+  }
+  .doc_list .doc_nav .navbar:nth-child(6) .lastitem,.doc_list .doc_nav .navbar:nth-child(6) .lastitem{
+    margin-left: 100px;
+  }
+  .doc_list .doc_nav .navbar .lastitem .item{
+    padding:0 15px;
+    font-weight: 700;
+    color:#666666;
+    display: inline-block;
+    margin:8px 0px;
+  }
+  .doc_list .doc_nav .navbar .lastitem .active{
+    background-color: rgb(80, 167, 254);
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .doc_list .doc_nav .navbar .lastitem a.item:hover{
+    cursor:pointer;
+  }
+  .doc_list .doc_nav .navbar .like{
+    width: 100px;
+    float: left;
+  }
+  .doc_list .doc_nav .navbar .condition{
+    padding:0px 4px 0px 6px;
+    background-color: rgb(242, 242, 242);
+    margin:7px 5px 0 0;
+    color:rgb(80,167,254);
+    font-family: 'Negreta';
+    float: left;
+    height: 26px;
+    line-height: 26px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .doc_list .doc_nav .navbar img{
+    margin-left: 3px;
+    width: 6px;
+    height: 6px;
+  }
+  .doc_list .doc_nav .navbar .condition .closeicon{
+    transform:translateY(-9px);
+  }
+  /*排序*/
+  .doc_list .doclist_check{
+    border-bottom:1px solid rgb(215,215,215);
+    width:100%;
+    height:40px;
+    line-height: 40px;
+  }
+  .doc_list .doclist_check .order{
+    font-weight: 700;
+    color:#949494;
+  }
+  .doc_list .doclist_check label{
+    margin:0 0 0 15px;
+  }
+
+  /*文章列表*/
+  .doc_list .list-item{
+    width: 615px;
+    height: 138px;
+    border-right: 1px dashed #666666;
+    float: left;
+    /* background: yellow; */
+    margin-top: 15px;
+    box-sizing: border-box;
+    padding: 15px;
+  }
+  .doc_list .list-item:nth-child(even){
+    margin-left: 10px;
+    border-right: none;
+  }
+  .doc_list .list-item .list-content{
+    width: 585px;
+  }
+
+  .doc_list .list-item .list-item-title{
+    height: 30px;
+    font-family: '微软雅黑';
+    font-weight: 400;
+    vertical-align: middle;
+  }
+  .doc_list .list-item .list-item-title>a{
+    line-height: 22px; 
+    font-size: 16px;
+  }
+  .doc_list .list-item .list-item-title>.icon{
+    padding: 0px 5px;
+		display: inline-block;
+		background-color: #F72612;
+		border-radius: 5px;
+		text-align: center;
+		color: #fff;
+		margin-right: 5px
+  }
+  .doc_list .list-item .list-item-title .list-item-title-good{
+    width: 45px;
+    float: right;
+  }
+  .doc_list .list-item .list-item-title .list-item-title-good>img{
+    width: 13px;
+    height: 13px;
+    vertical-align: middle;
+  }
+
+  .doc_list .list-item .list-item-art{
+    padding: 10px 0;
+  }
+  .doc_list .list-item .list-item-art>p{
+    font-size: 14px;
+    text-align: left;
+    font-family: '微软雅黑';
+    font-weight: 400;
+    color: #515151;
+  }
+
+  .doc_list .list-item .list-item-info>span{
+    display: inline-block;
+    width: 70px;
+    text-align: center;
+    font-size: 12px;
+    color: #949494;
+  }
+  .doc_list .list-item .list-item-art>p{
+    height: 48px;
+  }
+  /* 清除浮动 */
+  .doc_list .list::after{
+    content: '';
+    display: block;
+    clear: both;
+  }
+  /*分页*/
+  .doc_list .page{
+    text-align: center;
+    margin:80px 0;
+  }
+  /* 文章列表 */
+</style>

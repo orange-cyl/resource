@@ -1,0 +1,208 @@
+<!-- 
+  @author:zhengrong
+  @data:2018年12月19日15:01:49
+-->
+<template>
+  <div id="_header">
+    <div class="header-wrapper" v-if="path_=='/about'">
+      <img src="https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E9%A6%96%E9%A1%B5/u39.png" alt="" style="width:140px;height:52px;margin:0 auto;margin-top:11px;cursor:pointer;" @click="tohome">
+    </div>
+
+    <div class="header-wrapper" v-else-if="path_!=='/about'">
+      <div class="header-nav-left" @click="tohome">
+        <img :src=logo_dark alt="" v-if="path_ =='/'">
+        <img :src=logo_light alt="" v-else>
+      </div>
+
+      <div class="header-nav-position"></div>
+
+      <div class="header-nav-right" v-if="path_=='/'">
+        <div class="portrait" >
+          <img :src=imgUrl alt="">
+        </div>
+        <div @click="tovideo" class="videoDiv">
+          <i class="fa fa-file-video-o fa-2x fa-fw video-ico"></i>
+          <!-- <br> -->
+          <span>视频</span>
+        </div>
+        <div @click="todoc" class="docDiv">
+          <i class="fa fa-file-text fa-2x fa-fw doc-ico"></i>
+          <span>文档</span>
+        </div>
+        <div @click="toupload" class="uploadDiv">
+          <i class="fa fa-cloud-upload fa-2x fa-fw upload-ico"></i>
+          <span>上传</span>
+        </div>
+        <div @click="toabout" class="aboutDiv">
+          <i class="fa fa-info-circle fa-2x fa-fw about-ico"></i>
+          <span>关于杰普</span>
+        </div>
+      </div>
+
+      <div class="header-nav-right" v-else-if="path_!=='/'">
+        <div class="portrait">
+          <img :src=imgUrl alt="">
+        </div>
+        <div @click="tovideo" class="videoDiv_">
+          <i class="fa fa-file-video-o fa-2x fa-fw"></i>
+          <!-- <br> -->
+          <span>视频</span>
+        </div>
+        <div @click="todoc" class="docDiv_">
+          <i class="fa fa-file-text fa-2x fa-fw"></i>
+          <span>文档</span>
+        </div>
+        <div @click="toupload" class="uploadDiv_">
+          <i class="fa fa-cloud-upload fa-2x fa-fw"></i>
+          <span>上传</span>
+        </div>
+        <div @click="toabout" class="aboutDiv_">
+          <i class="fa fa-info-circle fa-2x fa-fw"></i>
+          <span>关于杰普</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</template>
+<script>
+export default {
+  data(){
+    return {
+      logo_light:'https://raw.githubusercontent.com/pluslicy/assets/master/resource/logo/LOGO-Light.png',
+      logo_dark:'https://raw.githubusercontent.com/pluslicy/assets/master/resource/logo/LOGO.png',
+      imgUrl:'https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E9%A6%96%E9%A1%B5/u43.png',
+      path_:'/',
+    }
+  },
+  watch:{
+    $route(to,from){
+      this.path_ = to.path;
+      this.listenPath();
+
+    }
+  },
+  created(){},
+  mounted(){      
+    this.path_ = '/'
+    this.listenPath();
+  },
+  methods:{
+    // 视频按钮
+    tovideo(){
+      this.$router.push('/video')
+    },
+    // 文档按钮
+    todoc(){
+      this.$router.push('/doc')
+    },
+    // 上传按钮
+    toupload(){
+      this.$router.push('/personal/space')
+    },
+    // 关于按钮
+    toabout(){
+      this.$router.push('/about')
+    },
+    tohome(){
+      this.$router.push('/')
+    },
+    listenPath(){
+      if(this.path_ == '/'){
+        let bgc = {"background-color":"rgba(255, 255, 255, 1)"};
+        $('#_header').css(bgc);
+        $('.header-wrapper').eq(0).css(bgc);
+        this.logoUrl = this.logo_dark;
+      }else if(this.path_ == '/about'){
+        let bgc = {"background-color":"rgba(255, 255, 255, 1)"};
+        $('#_header').css(bgc);
+        $('.header-wrapper').eq(0).css(bgc);
+      }else {
+        let bgc = {"background-color":"rgba(46, 51, 64, 1)"};
+        $('#_header').css(bgc);
+        $('.header-wrapper').eq(0).css(bgc);
+        this.logoUrl = this.logo_light;
+      }
+    },
+  },
+}
+</script>
+
+<style scoped>
+  #_header{
+    margin: 0;
+    box-sizing: border-box;
+    font-size: 16px;
+    font-family: Microsoft Yahei;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: bottom;
+    background-color: rgba(46, 51, 64, 1);
+    position: relative;
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.349019607843137);
+    width: 100%;
+  }
+  #_header .header-wrapper{
+    width: 1240px;
+    height: 74px;
+    margin: 0 auto;
+    background-color: rgba(46, 51, 64, 1);
+    display: flex;
+  }
+  #_header .header-nav-left{
+    flex: 293px;
+    padding: 11px 0;
+    cursor: pointer;
+  }
+  #_header .header-nav-position{
+    flex: 790px;
+  }
+  #_header .header-nav-right{
+    flex: 424px;
+    display: flex;
+  }
+  #_header .header-nav-right i{
+    display: block;
+    margin: 0 auto;
+    font-size: 22px;
+    line-height: 22px;
+  }
+  #_header .header-nav-right div:not(:first-child){
+    padding: 18px 0;
+    cursor: pointer;
+  }
+  #_header .header-nav-right>div:first-child{
+    padding: 14px 0;
+  }
+  #_header .header-nav-right .portrait img{
+    width: 45px;
+    height: 45px;
+  }
+  #_header .header-nav-right div{
+    flex: 1;
+    text-align: center;
+  }
+  #_header .header-nav-right span{
+    font-weight: 700;
+    font-size: 12px;
+  }
+  #_header .header-nav-right .videoDiv:hover,
+  #_header .header-nav-right .docDiv:hover,
+  #_header .header-nav-right .uploadDiv:hover,
+  #_header .header-nav-right .aboutDiv:hover{
+    color: #0099ff;
+  }
+  #_header .header-nav-right .videoDiv_,
+  #_header .header-nav-right .docDiv_,
+  #_header .header-nav-right .uploadDiv_,
+  #_header .header-nav-right .aboutDiv_{
+    color: #fff;
+  }
+  #_header .header-nav-right .videoDiv_:hover,
+  #_header .header-nav-right .docDiv_:hover,
+  #_header .header-nav-right .uploadDiv_:hover,
+  #_header .header-nav-right .aboutDiv_:hover{
+    color: #e4e4e4;
+  }
+</style>

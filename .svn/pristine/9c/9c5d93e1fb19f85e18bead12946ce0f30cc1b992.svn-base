@@ -1,0 +1,640 @@
+<template>
+  <div class="video_play">
+    <div class="tab_play">
+      视频教程&nbsp;>&nbsp;<span>{{title}}</span>
+    </div>
+    <div class="video_player">
+      <div class="left" >
+        <video class="video-js" controls preload="auto" width="860px" height="470px" poster="MY_VIDEO_POSTER.jpg" data-setup="{}">
+          <source src="http://vjs.zencdn.net/v/oceans.mp4" type='video/mp4'>
+        </video>
+      </div>
+      <div class="right">
+        <div class="right_title">
+          <span class="title">{{videoList.title}}</span>
+          <div class="store">
+            <img src="https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1214.png" alt="">
+            <span>收藏</span>
+          </div>
+        </div>
+        <div class="sulpture">
+          <img :src="videoList.img" alt="">
+          <span class="speaker">{{videoList.speaker}}</span>
+          <i class="fa fa-vimeo"></i>
+        </div>
+        <div class="commont">{{videoList.intro}}</div>
+        <div class="docs">
+          <ul>
+            <li class="doc" v-for="item in videoList.videos" :key="item.id">
+              <span class="section">{{item.section}}</span>
+              <span class="title">{{item.title}}</span>
+              <i class="fa fa-video-camera"></i>
+            </li>
+          </ul>
+          <img src="https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1222.png" alt="">
+        </div>
+        <div class="right-bottom">
+          <i class="fa fa-thumbs-up"></i>
+          <div class="lickNum">
+            <span>+1</span>
+            <span>（88）</span>
+          </div>
+          <i class="qzone fenxiang"></i>
+          <i class="weixin fenxiang"></i>
+          <i class="weibo fenxiang"></i>
+        </div>
+      </div>
+    </div>
+    <div class="comment">
+      <span class="text">评论</span>
+      <span class="num">(200)</span>
+    </div>
+    <div class="content">
+      <div class="left">
+        <textarea name="" id="" cols="30" rows="10" class="textarea" placeholder="我想对你说..."></textarea>
+        <!-- 评论的textarea -->
+        <div class="expression">
+          <img src="https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1244.png" alt="">
+          <span>表情</span>
+          <span class="button">评论</span>
+        </div>
+        <!-- 个人回复 -->
+        <div class="person_comment" >
+          <div class="single" v-for="item in person_data">
+            <div class="person">
+              <img :src="item.img" alt="">
+              <span class="name">{{item.name}}</span>
+              <span class="date">{{item.date}}</span>
+            </div>
+            <div class="text">{{item.comment}}</div>
+            <div class="iconimg">
+              <span>
+                <i class="fa fa-commenting-o"></i>
+                <span class="comtext">评论</span>
+                <i class="fa fa-thumbs-o-up"></i>
+                <span class="comtext">赞</span>
+              </span>
+            </div>
+            <div class="inputtext">
+              <input v-show="item.show" type="text" name="comment" v-model="comment" placeholder="唠一下...">
+              <div>
+                <img v-show="item.show" src="https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1244.png" alt="">
+                <span v-show="item.show" class="button">评论</span>
+                <div class="replylists">
+                  <div class="replylist" v-for="i in item.replyList">
+                    <div class="personcomment">
+                      <span class="name">{{i.replyA}}</span>
+                      <span class="name" v-show="!i.replyB">:</span>
+                      <span class="name reply" v-show="i.replyB">回复</span>
+                      <span class="name" v-show="i.replyB">{{i.replyB}}</span>
+                      <span class="name" v-show="i.replyB">:</span>
+                      <span class="comm">{{i.comment}}</span>
+                    </div>
+                    <div class="zan">
+                      <span>{{i.date}}</span>
+                      <span class="zan_contaniner">
+                        <i class="fa fa-commenting-o"></i>
+                        <span class="comtext">回复</span>
+                        <i class="fa fa-thumbs-o-up"></i>
+                        <span class="comtext">赞</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="img">
+          <img src="https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1344.jpg" alt="" width="100%" height="200">
+        </div>
+        <div class="list">
+          <ul>
+            <li>视频文档/资源推荐</li>
+            <li v-for="item in likeList">
+              <a href="#">{{item.title}}</a>
+              <span><i class="fa fa-eye"></i></span>
+            </li>
+          </ul>
+          <ul>
+            <li v-for="item in tuijianlist">
+              <a href="#">{{item.title}}</a>
+              <span>{{item.num}}人浏览</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script type="text/javascript">
+  export default{
+    data(){
+      return {
+        comment:'',
+        title:window.sessionStorage.getItem('title'),
+        videoList:{
+          id:'',
+          title:'JavaEE入门-环境搭建',
+          speaker:'崔略',
+          img:'https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1217.png',
+          intro:'Java是一门面向对象编程语言，不仅吸收了C++语言的各种优点，还摒弃了C++里难以理解的多继承、指针等概念，因此Java语言具有功能强....',
+          videos:[
+            {section:'第一节-',title:'环境搭建'},
+            {section:'第二节-',title:'环境搭建'},
+            {section:'第三节-',title:'环境搭建'}
+          ]
+        },
+        person_data:[
+          {
+            id:'',
+            show:true,
+            img:'https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1249.png',
+            name:'朱莉',
+            date:'2018-11-22',
+            comment:'Java是一门面向对象编程语言，不仅吸收了C++语言的各种优点，还摒弃了C++里难以理解的多继承、指针等概念，因此Java语言具有功能强....',
+            replyList:[
+              {
+                replyA:'森迪',
+                comment:'Java是一门面向对象编程语言',
+                date:'2018-11-22'
+              },
+              {
+                replyA:'朱莉',
+                replyB:'森迪',
+                comment:'Java是一门面向对象编程语言',
+                date:'2018-11-22'
+              }
+            ]
+          },
+          {
+            id:'',
+            name:'朱莉',
+            show:false,
+            img:'https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1249.png',
+            date:'2018-11-22',
+            comment:'Java是一门面向对象编程语言，不仅吸收了C++语言的各种优点...',
+          },{
+            id:'',
+            show:false,
+            name:'朱莉',
+            img:'https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1249.png',
+            date:'2018-11-22',
+            comment:'Java是一门面向对象编程语言，不仅吸收了C++语言的各种优点...',
+          },{
+            id:'',
+            show:false,
+            name:'朱莉',
+            img:'https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1249.png',
+            date:'2018-11-22',
+            comment:'Java是一门面向对象编程语言，不仅吸收了C++语言的各种优点，还摒弃了C++里难以理解的多继承、指针等概念，因此Java语言具有功能强....',
+          },{
+            id:'',
+            show:false,
+            name:'朱莉',
+            img:'https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1249.png',
+            date:'2018-11-22',
+            comment:'Java是一门面向对象编程语言，不仅吸收了C++语言的各种优点，还摒弃了C++里难以理解的多继承、指针等概念，因此Java语言具有功能强....',
+          }
+        ],
+        likeList:[
+          {
+            id:1,
+            title:'JavaEE修炼-环境搭建-PPT'
+          },{
+            id:1,
+            title:'JavaEE修炼-环境搭建-笔记'
+          },{
+            id:1,
+            title:'JavaEE修炼-环境搭建-心得'
+          },{
+            id:1,
+            title:'JavaEE修炼-环境搭建-代码'
+          }
+        ],
+        tuijianlist:[
+          {
+            id:1,
+            title:'Oracle视频教程',
+            num:100
+          },
+          {
+            id:1,
+            title:'Oracle视频教程',
+            num:100
+          },
+          {
+            id:1,
+            title:'Oracle视频教程',
+            num:100
+          },
+          {
+            id:1,
+            title:'Oracle视频教程',
+            num:100
+          },
+        ]
+      }
+    }
+  }
+</script>
+<style>
+  /*页面*/
+  .video_play{
+    font-family: '微软雅黑';
+  }
+  /*视频左侧*/
+  .video_play .tab_play{
+    margin-top:24px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 12px;
+  }
+  .video_play > .video_player > .left{
+    width: 860px;
+    height: 470px;
+    float: left;
+  }
+  .video_play > .video_player > .right{
+    width: 320px;
+    height: 430px;
+    margin-left: 880px;
+    padding:20px;
+    border:1px solid rgb(242, 242, 242);
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.349019607843137);
+    background-color: 
+  }
+  .video_play > .video_player > .right::after{
+    content: '';
+    display:block;
+    clear:both;
+  }
+  .video_play > .commont{
+    margin-top: 20px;
+  }
+  /*视频右侧*/
+  .video_play > .video_player > .right > .right_title > .title{
+    font-size: 16px;
+    font-weight:700;
+    font-style: normal;
+    font-family:'Arial Normal','微软雅黑 Bold', '微软雅黑 Regular', '微软雅黑';
+  }
+  .video_play > .video_player > .right > .right_title>.store{
+    width: 64px;
+    border:1px solid #0F69FF;;
+    color:#0F69FF;
+    float:right;
+    text-align: center;
+    border-radius: 12px;
+    height: 22px;
+    line-height: 22px;
+  }
+  .video_play > .video_player > .right > .right_title>.store:hover{
+    cursor:pointer;
+  }
+  .video_play > .video_player > .right > .sulpture{
+    height: 20px;
+    font-size: 12px;
+    line-height: 20px;
+    border-bottom:1px solid #D7D7D7;
+    padding-bottom: 13px;
+  }
+  .video_play > .video_player > .right > .sulpture i{
+    color:#0099FF;
+    font-size:13px;
+  }
+  .video_play > .video_player > .right > .sulpture img{
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+  }
+  .video_play > .video_player > .right > .sulpture > span.speaker{
+    margin:0 0 0 5px;
+  }
+  .video_play > .video_player > .right > .commont{
+    font-family: '微软雅黑 Regular', '微软雅黑';
+    font-weight: 400;
+    font-style: normal;
+    font-size: 12px;
+    border-bottom:1px solid #D7D7D7;
+    padding:6px 0;
+  }
+  .video_play > .video_player > .right > .docs{
+    margin-top: 20px;
+    font-size: 12px;
+    width: 100%;
+    height: 206px;
+  } 
+  .video_play > .video_player > .right > .docs img{
+    float:right;
+  }
+  .video_play > .video_player > .right > .docs >ul{
+    list-style: none;
+    float: left;
+    width: 300px;
+    max-height: 206px;
+  }
+  .video_play > .video_player > .right > .docs .doc i{
+    font-size:14px;
+    float:right;
+  }
+  .video_play > .video_player > .right > .docs .doc i:hover{
+    cursor: pointer;
+  }
+  .video_play > .video_player > .right > .docs >ul>li{
+    width: 100%;
+    height:30px;
+  }
+  .video_play > .video_player > .right > .docs .section{
+    font-weight: 700;
+  }
+  .video_play > .video_player > .right > .right-bottom{
+    height: 30px;
+    padding: 18px 18px 18px 0;
+  }
+  .video_play > .video_player > .right > .right-bottom .lickNum span:first-child{
+    margin-left:-3px;
+    color:#0099FF;
+  }
+  .video_play > .video_player > .right > .right-bottom i:first-child{
+    float: left;
+    font-size:30px;
+    color:#0099FF;
+  }
+  .video_play > .video_player > .right > .right-bottom i:hover{
+    cursor: pointer;
+  }
+  .video_play > .video_player > .right > .right-bottom div{
+    float: left;
+  }
+  .video_play > .video_player > .right > .right-bottom > .lickNum >span{
+    display: block;
+    line-height: 15px;
+  }
+
+
+
+  .video_play > .comment{
+    font-family: '微软雅黑 Bold', '微软雅黑 Regular', '微软雅黑';
+    font-weight: 700;
+    margin-top: 20px;
+  }
+  .video_play > .comment >.text{
+    font-size: 24px;
+    color: #868686;
+    margin-right: 6px;
+  }
+  .video_play > .comment >.num{
+    font-size: 20px;
+    color: #A1A1A1;
+  }
+  .video_play > .content{
+    margin-top: 20px;
+    width: 100%;
+    height: 100%;
+  }
+  .video_play > .content > .left{
+    width: 860px;
+    float: left;
+    position: relative;
+  }
+  .video_play > .content > .left .textarea{
+    width: 820px;
+    height: 170px;
+    font-size: 18px;
+    color:#868686;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.349019607843137);
+    resize:none;
+    padding: 20px;
+  }
+  .video_play > .content > .left .textarea:focus{
+    border-radius: 10px;
+    outline: none;
+  }
+  .video_play > .content > .left >.expression{
+    width: 800px;
+    position: absolute;
+    top:160px;
+    left: 20px;
+    font-weight: 400;
+    color: #434343;
+    font-size: 18px;
+  }
+  .video_play > .content > .left >.expression >span{
+    position: relative;
+    top:2px;
+  }
+  .video_play > .content > .left >.expression >img{
+    vertical-align: middle;
+    width: 26px;
+    height: 26px;
+  }
+  .video_play > .content > .left >.expression >img:hover{
+    cursor: pointer;
+  }
+  .video_play > .content > .left >.expression>.button{
+    float: right;
+    width: 113px;
+    height: 32px;
+    line-height: 32px;
+    background-color: #169BD5;
+    border-radius: 4px;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+  }
+  .video_play > .content > .left > .person_comment{
+    margin: 40px 0px 100px 0px;
+    width: 840px;
+  }
+  .video_play > .content > .left > .person_comment > .single{
+    padding:20px 0 40px 0;
+    width: 860px;
+    border-bottom: 1px dotted #AEAEAE;
+  }
+  .video_play > .content > .left > .person_comment .person{
+    height: 44px;
+  }
+  .video_play > .content > .left > .person_comment .person > img{
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    vertical-align: middle;
+  }
+  .video_play > .content > .left > .person_comment .person > span{
+    margin-left: 8px;
+  }
+  .video_play > .content > .left > .person_comment .person > .name{
+    font-family: "微软雅黑 Bold", "微软雅黑 Regular", "微软雅黑";
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .video_play > .content > .left > .person_comment .person > .date{
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .video_play > .content > .left > .person_comment .text{
+    width: 780px;
+    margin-left: 44px;
+    margin-top: 16px;
+    font-family: 微软雅黑;
+    font-weight: 400;
+    font-size: 16px;
+  }
+  .video_play > .content > .left > .person_comment .iconimg{
+    position: relative;
+    height: 60px;
+  }
+  .video_play > .content > .left > .person_comment .iconimg .comtext{
+    margin-right:8px;
+  }
+  .video_play > .content > .left > .person_comment .iconimg>span{
+    position: absolute;
+    top:30px;
+    right:40px;
+    font-size: 14px;
+  }
+  .video_play > .content > .left > .person_comment .iconimg>span:hover{
+    cursor:pointer;
+  }
+  .video_play > .content > .left > .person_comment .iconimg i{
+    font-size: 16px;
+  }
+  .video_play > .content > .left > .person_comment .inputtext{
+    width: 780px;
+    margin:0 auto;
+  }
+  .video_play > .content > .left > .person_comment input{
+    width: 100%;
+    height: 40px;
+    border:1px solid rgb(53, 133, 254);
+    border-radius: 10px;
+    text-indent: 15px;
+  }
+  .video_play > .content > .left > .person_comment .inputtext > div{
+    margin-top: 10px;
+  }
+  .video_play > .content > .left > .person_comment .inputtext div .button{
+    float: right;
+    width: 76px;
+    height: 28px;
+    line-height: 28px;
+    background-color: #169BD5;
+    border-radius: 6px;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+  }
+  .video_play > .content > .left > .person_comment .inputtext .replylists{
+    background-color:rgb(242, 242, 242);
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .video_play > .content > .left > .person_comment .inputtext .replylists .replylist{
+    border-bottom: 1px solid #ccc;
+    margin:0 20px;
+  }
+  .video_play > .content > .left > .person_comment .inputtext .replylists .replylist:last-child{
+    border:none;
+  }
+  .video_play > .content > .left > .person_comment .inputtext .replylists .replylist .name{
+    font-family: "微软雅黑 Bold", "微软雅黑 Regular", 微软雅黑;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 14px;
+  }
+  .video_play > .content > .left > .person_comment .inputtext .replylists .replylist .reply{
+    color:#AEAEAE
+  }
+  .video_play > .content > .left > .person_comment .inputtext .replylists .replylist div.personcomment{
+    height: 40px;
+    line-height: 40px;
+  }
+  .video_play > .content > .left > .person_comment .inputtext .replylists .replylist div.zan{
+    margin-bottom: 10px;
+  }
+  .video_play > .content > .left > .person_comment .inputtext .replylists .replylist div.zan .comtext:first-of-type{
+    margin-right:8px;
+  }
+  .video_play > .content > .left > .person_comment .inputtext .replylists .replylist div.zan span:first-child{
+    font-size: 12px;
+  }
+  .video_play > .content > .left > .person_comment .inputtext .replylists .replylist .zan_contaniner{
+    float: right;
+  }
+  .video_play > .content > .left > .person_comment .inputtext .replylists .replylist .zan_contaniner:hover{
+    cursor:pointer;
+  }
+
+  .video_play > .content > .right{
+    margin-left: 20px;
+    width: 360px;
+    height: 980px;
+    float: left;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.349019607843137);
+  }
+  .video_play > .content > .right::after{
+    content: '';
+    display:block;
+    clear:both;
+  }
+  .video_play > .content > .right > .list ul{
+    list-style: none;
+  } 
+  .video_play > .content > .right > .list ul li{
+    margin:0 10px;
+    border-bottom: 1px solid #ccc;
+    height: 40px;
+    line-height: 40px;
+  }
+  .video_play > .content > .right > .list ul:first-child li:first-child{
+    font-family: "微软雅黑 Bold", "微软雅黑 Regular", 微软雅黑;
+    font-weight: 700;
+    font-size: 20px;
+    font-style: normal;
+    margin-top: 10px;
+  }
+  .video_play > .content > .right > .list ul li span{
+    float: right;
+  }
+  .video_play > .content > .right > .list ul li span i{
+    margin-right: 20px;
+  }
+  .video_play > .content > .right > .list ul li span i:hover{
+    cursor: pointer;
+  }
+  .video_play > .content > .right > .list ul:last-child li span{
+    font-family: "微软雅黑 Bold", "微软雅黑 Regular", 微软雅黑;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 12px;
+    margin-right: 10px;
+  }
+
+  .video_play .weibo{
+    width: 25px;
+    height: 25px;
+    background:url("https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1220.jpg");
+    background-size:100% 100%;
+  }
+  .video_play .weixin{
+    width: 25px;
+    height: 25px;
+    background:url("https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1219.jpg");
+    background-size:100% 100%;
+  }
+  .video_play .qzone{
+    width: 25px;
+    height: 25px;
+    background: url("https://raw.githubusercontent.com/pluslicy/assets/master/resource/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E9%A1%B5/u1221.jpg");
+    background-size:100% 100%;
+  }
+  .video_play .fenxiang{
+    font-size:25px;float:right;margin:2.5px 0 0 2px;
+  }
+</style>

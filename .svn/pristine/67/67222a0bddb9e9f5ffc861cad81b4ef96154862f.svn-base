@@ -1,0 +1,44 @@
+import axios from '@/http/axios';
+export default {
+  state:{
+   doc:[],
+   catalogue:[]
+  },
+  getters:{
+   doc:state=>state.doc,
+   catalogue:state=>state.catalogue
+  },
+  mutations:{
+    changeDoc(state,data){
+      state.doc=data.data.results
+    },
+     changeCatalogue(state,data){
+      // console.log(data.data.results)
+      state.catalogue=data.data.results
+    }
+  },
+  actions:{
+      findAllCatalogue(context,params){
+        return new Promise((resolve,reject)=>{
+          axios.get('/up_site_res/catalogue/').then((res)=>{
+          // console.log('======',res.data.data)
+          context.commit("changeCatalogue",res)
+          resolve(res)
+        }).catch((error)=>{
+          reject(error)
+        })
+        })
+      },
+      findDocList(context,params){
+        return new Promise((resolve,reject)=>{
+          axios.get('/up_site_res/docs/',params).then((res)=>{
+          // console.log('======',res.data.data)
+          context.commit("changeDoc",res)
+          resolve(res)
+        }).catch((error)=>{
+          reject(error)
+        })
+        })
+      }
+  }
+}

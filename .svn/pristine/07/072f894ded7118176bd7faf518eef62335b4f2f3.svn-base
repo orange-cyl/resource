@@ -1,0 +1,257 @@
+<template>
+	<div class="upVideoDoc">
+		<div class="centerDiv">
+			<div class="upDiv">
+				<div class="picUrl" @click="turnUpdatePage">
+					<img src="https://github.com/pluslicy/assets/blob/master/resource/%E8%A7%86%E9%A2%91%E4%B8%8A%E4%BC%A0/u1957.png?raw=true" alt="">
+					<form action="www.baidu.com" method="post">
+						<input type="file" id="file" :accept=acceptType  @change="changeFile($event)" multiple  style="display:none">
+						<input type="submit" id="submit" name="" style="display:none;">
+					</form>
+					
+				</div>
+				<div class="selectTitle">
+					请选择您的{{selectContent}}
+				</div>
+			</div>
+			<div class="serverDoc">
+				上传{{selectContent}},即表示您已同意杰普<a class="serveA" @click="showDialog">服务条款</a> , 请勿上传色情及反动等违法{{selectContent}}
+			</div>
+			<div class="numSize">
+				<span>上传数量&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+				<span>{{selectContent}}大小&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+				<span>{{selectContent}}规格&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+				<span v-if="selectContent=='视频'">视频时长&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+				<span>其他问题</span>				
+				
+			</div>
+		</div>
+
+		<!--服务条款模态框-->
+		<el-dialog
+		  title="杰普上传视频/文档服务条款"
+		  :visible.sync="centerDialogVisible"
+		  width="30%"
+		  center>
+		  <span>服务条款内容</span>
+		  <span slot="footer" class="dialog-footer">
+		  	<button @click="centerDialogVisible = false">取消</button>
+		  	<button @click="centerDialogVisible = false">确定</button>
+		  </span>
+		</el-dialog>
+	</div>
+</template>
+<script>
+import {mapActions,mapGetters,mapMutations} from 'vuex';
+	export default {
+		
+		data(){
+			return {
+				selectContent:'',//用户选择跳转当前页面的信息 视频/文档
+				centerDialogVisible:false,//模态框默认不显示
+				acceptType:"video/*",//默认用户点击上传打开input时，只能选择视频文件
+			}
+		},
+		//映射数据
+		computed:{
+     	...mapGetters(['newArr','nameArr'])
+		},
+		created(){
+			if(this.$route.query.msg=='upVideo'){
+				this.selectContent="视频";
+				this.acceptType="video/*";//当用户点击上传视频时，控制打开文件夹只能识别视频
+			}else{
+				this.selectContent="文档";
+				this.acceptType=".doc,.docx,.xls,.xlsx,.pdf,.ppt,.txt,.md";//当用户点击上传文档时，控制打开文件夹只能识别文档
+			}
+			
+		},
+		mounted(){
+
+		},
+		methods:{
+     ...mapActions(['changeNewArr','changeNameArr']),
+
+			//点击上传图片跳转到上传页面，暂时文档和视频跳转到一个路由
+			turnUpdatePage(){
+				$("#file").click();
+				//this.$router.push({path: '/personal/realUpVideo'})
+			},
+			//点击服务条款，显示模态框
+			showDialog(){
+				this.centerDialogVisible=true;
+			},
+			//用户选择文件
+			changeFile(e){
+				$("#submit").click();
+				// console.log('1........',e)
+				// console.log(e.target.files);//选择文件的名称对象
+				var test = {}
+				for(var i in e.target.files) {
+					// console.log(typeof e.target.files[i])
+					if(typeof e.target.files[i] === typeof test){
+						var arr3 = this.newArr
+						arr3.push(e.target.files[i])
+						this.changeNewArr(arr3)
+					}
+					
+				}
+				// console.log(this.newArr)
+
+				// console.log('new',this.newArr)
+				if(this.newArr.length!=0){
+					// var upLoadFileName=e.target.files[0].name;
+					var count = 0
+
+					this.newArr.forEach((item,index)=>{
+						count = count + item.size
+					})
+					var arr1=[]
+					this.changeNameArr(arr1)
+					this.newArr.forEach((item,index)=>{
+						
+						var arr2=this.nameArr
+						arr2.push(item.name)
+					// this.changeNameArr(arr2)
+
+					})
+
+				// console.log('........',this.nameArr)
+
+					// alert(count)
+					var fileSize=count/1024;
+					
+					if(fileSize<1024){
+						fileSize=fileSize.toFixed(2)+"KB"
+					}else if(fileSize>=1024){
+						fileSize=fileSize/1024;
+						if(fileSize<1024){
+							fileSize=fileSize.toFixed(2)+"MB"
+						}else if(fileSize>=1024){
+							fileSize=fileSize/1024;
+							if(fileSize<1024){
+								fileSize=fileSize.toFixed(2)+"GB";
+							}else{
+								fileSize="文件过大"
+							}
+						}
+					}
+					// var arr=upLoadFileName.split(",");
+					//if(arr[1]){}
+					// alert(fileSize)
+					// console.log(this.nameArr)
+					if(this.$route.query.msg=='upVideo'){
+						this.$router.push({path: '/personal/realUpVideo',query:{fileName:this.nameArr,fileSize:fileSize}});
+					}else{
+						this.$router.push({path: '/personal/realUpDoc',query:{fileName:this.nameArr,fileSize:fileSize}});
+
+					}
+				}
+
+				
+				
+			}
+			
+		}
+	}
+</script>
+<style scoped>
+	ul{
+		list-style:none;
+	}
+	.upVideoDoc{
+		border:1px solid #E4E4E4;
+		height: 738px;
+		margin-top: 40px;
+		margin-bottom: 40px;
+	}
+	.upVideoDoc .centerDiv{
+		width: 700px;
+		margin:0 auto;
+		margin-top: 190px;
+	}
+
+	.upVideoDoc .centerDiv .upDiv{
+		
+		text-align: center;
+		margin-bottom: 40px;
+
+	}
+	.upVideoDoc .centerDiv .upDiv .picUrl{
+		width: 80px;
+		height: 77px;
+		margin:0 auto;
+		cursor: pointer;
+
+	}
+
+	.upVideoDoc .centerDiv .upDiv .selectTitle{
+		font-size: 30px;
+		font-weight: 550;
+		margin-top: 10px;
+		color: #333333
+	}
+	.upVideoDoc .centerDiv .upDiv .picUrl img{
+		width: 80px;
+		height: 77px;
+	}
+
+	.upVideoDoc .numSize,.upVideoDoc .serverDoc{
+		text-align: center;
+	}
+	.serveA{
+		color: #6C99FF;
+		text-decoration: underline;
+		cursor: pointer;
+	}
+	.upVideoDoc .serverDoc{
+		font-size: 12px;
+		font-weight: bold;
+	}
+
+	.upVideoDoc .numSize{
+		font-size: 12px;
+		margin-top: 10px;
+	}
+
+
+	/*模态框样式*/
+	span.dialog-footer button{
+		width: 74px;
+		height: 40px;
+		border-radius: 4px;
+		font-size: 14px;
+		font-weight: 500;
+		text-align: center;
+		cursor: pointer;
+		border: 1px solid #dcdfe6;
+	}
+
+	span.dialog-footer button:first-child{
+		    background: #fff;
+		    border-color: #dcdfe6;
+		    color: #606266;
+	}
+
+	span.dialog-footer button:first-child:hover{
+		background-color:#B9D3EE;
+		opacity: 0.5;
+		color:#104E8B;
+		border:1px solid  #409eff;
+	}
+
+	span.dialog-footer button:last-child{
+		    color: #fff;
+		    background-color: #409eff;
+		    border-color: #409eff;
+		    margin-left: 15px;
+
+	}
+
+	span.dialog-footer button:last-child:hover{
+		opacity: 0.8
+	}
+	
+
+	
+</style>

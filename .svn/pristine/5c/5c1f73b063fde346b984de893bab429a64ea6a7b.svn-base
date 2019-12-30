@@ -1,0 +1,47 @@
+import axios from '@/http/axios';
+export default {
+    state:{
+        // 编目数据
+        catalogue:[],
+        // 视频数据
+        video:[]
+    },
+    getters:{
+        catalogue:state => state.catalogue,
+        video:state => state.video
+    },
+    mutations:{
+        // 编目事件
+        changeCatalogue(state,data){
+            state.catalogue = data.data.results;
+        },
+        // 视频事件
+        changeVideo(state,data){
+            state.video = data.data.results;
+        }
+    },
+    actions:{
+        // 检索所有编目
+        findAllCatalogue(context,params){
+            axios.get('/up_site_res/catalogue/')
+            .then(res => {
+                context.commit("changeCatalogue",res)
+            })
+            .catch(err => {
+                reject(err)
+            })
+        },
+        
+        // 获取所有视频
+        findAllVideo(context,params){
+            axios.get('/up_site_res/videos/',params)
+            .then(res => {
+                // console.log(res.data.count)
+                context.commit("changeVideo",res)
+            })
+            .catch(err => {
+                reject(err)
+            })
+        },
+    }
+}

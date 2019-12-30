@@ -1,0 +1,1573 @@
+<!-- 
+  @author:liuyr
+-->
+<template>
+  <div class="index">
+    <!-- 轮播 -->
+    <div class="index_el">
+      <div class="index_el-carousel">
+        <!-- <el-carousel @change="carouselChange" ref="carousel" height="475px" arrow="never" :interval="interval"> -->
+        <el-carousel ref="carousel" height="475px" arrow="never" :interval="interval">
+          <el-carousel-item v-for="(item,index) in carouselArr" :key="index">
+            <img :src="item.imgUrl" alt="">
+          </el-carousel-item>
+        </el-carousel>
+      </div>
+      <!-- 左侧列表 -->
+      <div class="index_types">
+        <ul>
+          <!-- <li class="pointer" @click="changeCarousel($event,index)" v-for="(item,index) in typesArr" :key="index"> -->
+          <li @mouseenter="showTechnology(index)" @mouseleave="hideTechnology" class="pointer" v-for="(item,index) in typesArr" :key="index">
+            <span>{{item.name}}</span>
+            <span><i class="fa fa-chevron-right"></i></span>
+            <div class="index_types_detail" v-if="index==technologyIndex">
+              <div><span>相关技术</span></div>
+              <ul>
+                <li class="pointer" @click="toTechnology(technology.id)" v-for="(technology,num) in item.technologies" :key="num">
+                  {{technology.name}}
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- 排行榜单 -->
+    <div class="index_hot_list">
+      <div class="index_list_title">
+        <span>排行榜单</span>
+        <span class="pointer">更多<i class="fa fa-chevron-right"></i></span>
+      </div>
+      <div class="index_list_content">
+        <div class="index_list_video">
+          <ul>
+            <li v-for="(item,index) in hotList.videoList" :key="index">
+              <img @click="toVideoDetail(item.id)" :src="item.imgUrl" alt="">
+              <!-- 视频信息 -->
+              <div v-if="index==0" class="index_video_info">
+                <span>
+                  {{item.name}}  —{{item.teacherName}}
+                </span>
+                <span class="pointer">
+                  <i class="fa fa-thumbs-up"></i> {{item.num}}
+                </span>
+              </div>
+              <div v-else class="index_video_info">
+                <div>
+                  {{item.name}}
+                </div>
+                <div>
+                  <span>
+                    <small>{{item.teacherName}}</small>
+                  </span>
+                  <span class="pointer">
+                    <i class="fa fa-thumbs-up"></i> {{item.num}}
+                  </span>
+                </div>
+              </div>
+              <div class="index_video_index">{{index+1}}</div>
+              <div @click="toVideoDetail(item.id)" class="pointer index_video_play"><i class="fa fa-play-circle-o"></i></div>
+            </li>
+          </ul>
+        </div>
+        <div class="index_list_doc">
+          <div class="index_doc_title">
+            <span>文章榜单</span>
+          </div>
+          <div class="index_doc_content">
+            <ul>
+              <li @click="toDocDetail(item.id)" v-for="(item,index) in hotList.docList" :key="index" class="pointer">
+                <div v-if="index<3">
+                  <img class="index_doc_index" :src="docImgsList[index]"  alt=""/>
+                  <span>{{item.teacherName}}-{{item.name}}</span>
+                  <span><i class="fa fa-thumbs-up"></i> {{item.num}}</span>
+                </div>
+                <div v-else>
+                  <span class="index_doc_index">{{index+1}}</span>
+                  <span>{{item.teacherName}}-{{item.name}}</span>
+                  <span class="pointer"><i class="fa fa-thumbs-up"></i> {{item.num}}</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 免费视频教程与您分享 -->
+    <div class="index_free_video_list">
+      <div class="index_list_title">
+        <span>免费视频教程与您分享</span>
+        <span class="pointer">更多<i class="fa fa-chevron-right"></i></span>
+      </div>
+      <div class="index_free_content"> 
+        <ul>
+          <li @click="toFreeVideoDetail(item.id)" v-for="(item,index) in freeVideoList" :key="index">
+            <div class="index_free_item pointer">
+              <img :src="item.imgUrl" alt="">
+              <div class="index_free_name">
+                {{item.name}}
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- 最新动态 -->
+    <div class="index_news_list">
+      <div class="index_list_title">
+        <span>最新动态</span>
+      </div>
+      <div class="index_news_content">
+        <ul>
+          <li v-for="(item,index) in newsList" :key="index">
+            <div class="index_news_item">
+              <div class="index_news_type">
+                <span>{{item.name}}</span>
+                <div class="index_news_line"></div>
+              </div>
+              <!-- 文章内容 -->
+              <div @click="toDocDetail(item.doc.id)" class="index_news_doc_content pointer">
+                <div class="index_news_img">
+                  <img :src="item.doc.imgUrl" alt="">
+                </div>
+                <div class="index_news_info">
+                  <div class="index_news_doc_content_name">
+                    {{item.doc.name}}
+                  </div>
+                  <div class="index_news_doc_content_info">
+                    <span>作者: {{item.doc.author}}</span>
+                    <span>{{item.doc.time}}</span>
+                  </div>
+                  <div class="index_news_doc_content_content">
+                    {{item.doc.content}}
+                  </div>
+                </div>
+              </div>
+              <div class="index_news_video_doc">
+                <div class="index_news_video_list">
+                  <span>最新视频</span>
+                  <ul>
+                    <li @click="toVideoDetail(videoItem.id)" class="pointer" v-for="(videoItem,index) in item.videsNews" :key="index">
+                      <span>{{videoItem.name}}</span>
+                      <span>{{videoItem.time}}</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="index_news_doc_list">
+                  <span>最新文章</span>
+                  <ul>
+                    <li  @click="toDocDetail(docItem.id)" class="pointer" v-for="(docItem,index) in item.docNews" :key="index">
+                      <span>{{docItem.name}}</span>
+                      <span>{{docItem.time}}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- 学习资源推荐 -->
+    <div class="index_learn_list">
+      <div class="index_list_title">
+        <span>学习资源推荐</span>
+        <span class="pointer">更多<i class="fa fa-chevron-right"></i></span>
+        <span class="pointer"><i class="fa fa-plus"></i>申请杰普认证</span>
+      </div>
+      <div class="index_learn_choice">
+        <span @click="changeChoice(item.id,index)" class="pointer" v-for="(item,index) in learnChoiceList" :key="index">{{item.name}}</span>
+      </div>
+      <div class="index_learn_content"> 
+        <div class="index_learn_item" v-for="(item,index) in learnsList" :key="index">
+          <div class="learn_author_info">
+            <div class="learn_author_img">
+              <img :src="item.imgUrl" alt="">
+            </div>
+            <div class="learn_author_name">
+              <div><span>{{item.name}}</span><i style="color:#0299FF" class="fa fa-vimeo"></i></div>
+              <div>{{item.ranks}}</div>
+            </div>
+            <div class="learn_author_num">
+              共{{item.num}}篇文章
+            </div>
+          </div>
+          <div class="index_learn_doc">
+            <ul>
+              <li @click="toDocDetail(doc.id)" class="pointer" v-for="(doc,index) in item.docList" :key="index">
+                <FileIcon :fa="doc.icon"/>
+                <span>{{doc.name}}</span>
+                <span>{{doc.time}}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- <i class="fa fa-file-pdf-o"></i>    pdf
+        <i class="fa fa-file-word-o"></i>   word
+        <i class="fa fa-file-powerpoint-o"></i>   ppt
+        <i class="fa fa-file-text-o"></i>   txt
+        <i class="fa fa-file-o"></i>  其他 -->
+      </div>
+    </div>
+    <!-- 合作院校 -->
+    <div class="index_school_list">
+      <div class="index_list_title">
+        <span>合作院校</span>
+      </div>
+      <div class="index_school_content">
+        <div class="index_school_item" v-for="(item,index) in schoolList" :key="index">
+          <img :src="item" alt="">
+          <div class="index_school_border"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+import FileIcon from '@/components/fileicon.vue'
+export default {
+  components:{
+    FileIcon
+  },
+  data(){
+    return {
+      technologyIndex:100,
+      fatest:'fa-file-o',
+      interval:3000,
+      carouselArr:[{
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u247.jpg?raw=true',
+        toUrl:'',
+      },{
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u3.jpg?raw=true',
+        toUrl:'',
+      },{
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u247.jpg?raw=true',
+        toUrl:'',
+      },{
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u3.jpg?raw=true',
+        toUrl:'',
+      },{
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u247.jpg?raw=true',
+        toUrl:'',
+      },{
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u3.jpg?raw=true',
+        toUrl:'',
+      },{
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u247.jpg?raw=true',
+        toUrl:'',
+      },{
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u3.jpg?raw=true',
+        toUrl:'',
+      }],
+      //轮播左侧列表
+      typesArr:[{
+        name:'JavaEE企业级开发',
+        technologies:[{
+          name:'CoreJava',
+          id:'1001'
+        },{
+          name:'Oracle',
+          id:'1002'
+        },{
+          name:'JDBC',
+          id:'1003'
+        },{
+          name:'MyBatis',
+          id:'1004'
+        },{
+          name:'Servlet',
+          id:'1005'
+        },{
+          name:'JSP',
+          id:'1006'
+        }]
+      },{
+        name:'人工智能Python全栈',
+        technologies:[{
+          name:'CoreJava',
+          id:'1001'
+        },{
+          name:'Oracle',
+          id:'1002'
+        },{
+          name:'JDBC',
+          id:'1003'
+        },{
+          name:'MyBatis',
+          id:'1004'
+        },{
+          name:'Servlet',
+          id:'1005'
+        },{
+          name:'JSP',
+          id:'1006'
+        }]
+      },{
+        name:'H5全栈开发',
+        technologies:[{
+          name:'HTML',
+          id:'1001'
+        },{
+          name:'CSS',
+          id:'1002'
+        },{
+          name:'JavaScript',
+          id:'1003'
+        },{
+          name:'jQuery',
+          id:'1004'
+        },{
+          name:'Vue',
+          id:'1005'
+        },{
+          name:'NodeJS',
+          id:'1006'
+        }]
+      },{
+        name:'区块链嵌入式开发',
+        technologies:[{
+          name:'HTML',
+          id:'1001'
+        },{
+          name:'CSS',
+          id:'1002'
+        },{
+          name:'JavaScript',
+          id:'1003'
+        },{
+          name:'jQuery',
+          id:'1004'
+        },{
+          name:'Vue',
+          id:'1005'
+        },{
+          name:'NodeJS',
+          id:'1006'
+        }]
+      },{
+        name:'大数据开发',
+        technologies:[{
+          name:'HTML',
+          id:'1001'
+        },{
+          name:'CSS',
+          id:'1002'
+        },{
+          name:'JavaScript',
+          id:'1003'
+        },{
+          name:'jQuery',
+          id:'1004'
+        },{
+          name:'Vue',
+          id:'1005'
+        },{
+          name:'NodeJS',
+          id:'1006'
+        }]
+      },{
+        name:'PHP全栈开发',
+        technologies:[{
+          name:'HTML',
+          id:'1001'
+        },{
+          name:'CSS',
+          id:'1002'
+        },{
+          name:'JavaScript',
+          id:'1003'
+        },{
+          name:'jQuery',
+          id:'1004'
+        },{
+          name:'Vue',
+          id:'1005'
+        },{
+          name:'NodeJS',
+          id:'1006'
+        }]
+      },{
+        name:'Android开发工程师',
+        technologies:[{
+          name:'HTML',
+          id:'1001'
+        },{
+          name:'CSS',
+          id:'1002'
+        },{
+          name:'JavaScript',
+          id:'1003'
+        },{
+          name:'jQuery',
+          id:'1004'
+        },{
+          name:'Vue',
+          id:'1005'
+        },{
+          name:'NodeJS',
+          id:'1006'
+        }]
+      },{
+        name:'IOS开发工程师',
+        technologies:[{
+          name:'HTML',
+          id:'1001'
+        },{
+          name:'CSS',
+          id:'1002'
+        },{
+          name:'JavaScript',
+          id:'1003'
+        },{
+          name:'jQuery',
+          id:'1004'
+        },{
+          name:'Vue',
+          id:'1005'
+        },{
+          name:'NodeJS',
+          id:'1006'
+        }]
+      }],
+      //排行榜单数组
+      hotList:{
+        //视频列表数据
+        videoList:[{
+          id:1001,
+          imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u90.png?raw=true',
+          name:'Java是怎样炼成的',
+          teacherName:'崔略',
+          num:666
+        },{
+          id:1002,
+          imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u62.png?raw=true',
+          name:'Java是怎样炼成的',
+          teacherName:'崔略',
+          num:666
+        },{
+          id:1003,
+          imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u69.png?raw=true',
+          name:'Java是怎样炼成的',
+          teacherName:'崔略',
+          num:666
+        },{
+          id:1004,
+          imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u76.png?raw=true',
+          name:'Java是怎样炼成的',
+          teacherName:'崔略',
+          num:666
+        },{
+          id:1005,
+          imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u83.png?raw=true',
+          name:'Java是怎样炼成的',
+          teacherName:'崔略',
+          num:666
+        }],
+        //文章列表数据
+        docList:[{
+          id:1001,
+          name:'Java面试必备',
+          teacherName:'朱莉',
+          num:66
+        },{
+          id:1002,
+          name:'Java面试必备',
+          teacherName:'朱莉',
+          num:66
+        },{
+          id:1003,
+          name:'Java面试必备',
+          teacherName:'朱莉',
+          num:66
+        },{
+          id:1004,
+          name:'Java面试必备',
+          teacherName:'朱莉',
+          num:66
+        },{
+          id:1005,
+          name:'Java面试必备',
+          teacherName:'朱莉',
+          num:66
+        },{
+          id:1006,
+          name:'Java面试必备',
+          teacherName:'朱莉',
+          num:66
+        },{
+          id:1007,
+          name:'Java面试必备',
+          teacherName:'朱莉',
+          num:66
+        },{
+          id:1008,
+          name:'Java面试必备',
+          teacherName:'朱莉',
+          num:66
+        }]
+      },
+      docImgsList:['https://github.com/pluslicy/assets/blob/master/resource/首页/u553.png?raw=true','https://github.com/pluslicy/assets/blob/master/resource/首页/u554.png?raw=true','https://github.com/pluslicy/assets/blob/master/resource/首页/u555.png?raw=true'],
+      //免费视频
+      freeVideoList:[{
+        id:1001,
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u247.jpg?raw=true',
+        name:'JavaEE企业级开发',
+      },{
+        id:1002,
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u263.jpg?raw=true',
+        name:'人工智能Python全栈',
+      },{
+        id:1003,
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u255.jpg?raw=true',
+        name:'H5全栈开发',
+      },{
+        id:1004,
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u259.jpg?raw=true',
+        name:'PHP全栈开发',
+      },{
+        id:1005,
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u251.jpg?raw=true',
+        name:'大数据开发',
+      }],
+      //最新动态
+      newsList:[{
+        name:'JavaEE',
+        doc:{
+          id:1001,
+          imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u429.jpg?raw=true',
+          name:'故事的小黄花',
+          author:'JAY',
+          time:'2018-11-28',
+          content:"从出生那年就飘着，童年的荡秋千，随记忆一直晃到现在，Re So So Si Do Si La，So La Si Si Si Si La Si La So，吹着前奏，望着天空，我想起花瓣，试着掉落 ，为你翘课的那一天，花落的那一天，试着掉落 ，为你翘课的那一天，花落的那一天....."
+        },
+        videsNews:[{
+          id:1001,
+          name:'从出生那年就飘着',
+          time:'2018-11-28'
+        },{
+          id:1002,
+          name:'童年的荡秋千',
+          time:'2018-11-28'
+        },{
+          id:1003,
+          name:'随记忆一直晃到现在',
+          time:'2018-11-28'
+        },{
+          id:1004,
+          name:'吹着前奏 望着天空',
+          time:'2018-11-28'
+        },{
+          id:1005,
+          name:'我想起花瓣 试着掉落',
+          time:'2018-11-28'
+        }],
+        docNews:[{
+          id:1001,
+          name:'从出生那年就飘着',
+          time:'2018-11-28'
+        },{
+          id:1002,
+          name:'童年的荡秋千',
+          time:'2018-11-28'
+        },{
+          id:1003,
+          name:'随记忆一直晃到现在',
+          time:'2018-11-28'
+        },{
+          id:1004,
+          name:'吹着前奏 望着天空',
+          time:'2018-11-28'
+        },{
+          id:1005,
+          name:'我想起花瓣 试着掉落',
+          time:'2018-11-28'
+        }]
+      },{
+        name:'大数据',
+        doc:{
+          id:1002,
+          imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u466.jpg?raw=true',
+          name:'故事的小黄花',
+          author:'JAY',
+          time:'2018-11-28',
+          content:"从出生那年就飘着，童年的荡秋千，随记忆一直晃到现在，Re So So Si Do Si La，So La Si Si Si Si La Si La So，吹着前奏，望着天空，我想起花瓣，试着掉落 ，为你翘课的那一天，花落的那一天。从出生那年就飘着，童年的荡秋千，随记忆一直晃到现在，Re So So Si Do Si La，So La Si Si Si Si La Si La So，吹着前奏，望着天空，我想起花瓣，试着掉落 ，为你翘课的那一天，花落的那一天"
+        },
+        videsNews:[{
+          id:1001,
+          name:'从出生那年就飘着',
+          time:'2018-11-28'
+        },{
+          id:1002,
+          name:'童年的荡秋千',
+          time:'2018-11-28'
+        },{
+          id:1003,
+          name:'随记忆一直晃到现在',
+          time:'2018-11-28'
+        },{
+          id:1004,
+          name:'吹着前奏 望着天空',
+          time:'2018-11-28'
+        },{
+          id:1005,
+          name:'我想起花瓣 试着掉落',
+          time:'2018-11-28'
+        }],
+        docNews:[{
+          id:1001,
+          name:'从出生那年就飘着',
+          time:'2018-11-28'
+        },{
+          id:1002,
+          name:'童年的荡秋千',
+          time:'2018-11-28'
+        },{
+          id:1003,
+          name:'随记忆一直晃到现在',
+          time:'2018-11-28'
+        },{
+          id:1004,
+          name:'吹着前奏 望着天空',
+          time:'2018-11-28'
+        },{
+          id:1005,
+          name:'我想起花瓣 试着掉落',
+          time:'2018-11-28'
+        }]
+      },{
+        name:'Android',
+        doc:{
+          id:1003,
+          imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u475.jpg?raw=true',
+          name:'故事的小黄花',
+          author:'JAY',
+          time:'2018-11-28',
+          content:"从出生那年就飘着，童年的荡秋千，随记忆一直晃到现在，Re So So Si Do Si La，So La Si Si Si Si La Si La So，吹着前奏，望着天空，我想起花瓣，试着掉落 ，为你翘课的那一天，花落的那一天。从出生那年就飘着，童年的荡秋千，随记忆一直晃到现在，Re So So Si Do Si La，So La Si Si Si Si La Si La So，吹着前奏，望着天空，我想起花瓣，试着掉落 ，为你翘课的那一天，花落的那一天"
+        },
+        videsNews:[{
+          id:1001,
+          name:'从出生那年就飘着',
+          time:'2018-11-28'
+        },{
+          id:1002,
+          name:'童年的荡秋千',
+          time:'2018-11-28'
+        },{
+          id:1003,
+          name:'随记忆一直晃到现在',
+          time:'2018-11-28'
+        },{
+          id:1004,
+          name:'吹着前奏 望着天空',
+          time:'2018-11-28'
+        },{
+          id:1005,
+          name:'我想起花瓣 试着掉落',
+          time:'2018-11-28'
+        }],
+        docNews:[{
+          id:1001,
+          name:'从出生那年就飘着',
+          time:'2018-11-28'
+        },{
+          id:1002,
+          name:'童年的荡秋千',
+          time:'2018-11-28'
+        },{
+          id:1003,
+          name:'随记忆一直晃到现在',
+          time:'2018-11-28'
+        },{
+          id:1004,
+          name:'吹着前奏 望着天空',
+          time:'2018-11-28'
+        },{
+          id:1005,
+          name:'我想起花瓣 试着掉落',
+          time:'2018-11-28'
+        }]
+      },{
+        name:'Python',
+        doc:{
+          id:1004,
+          imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u484.jpg?raw=true',
+          name:'故事的小黄花',
+          author:'JAY',
+          time:'2018-11-28',
+          content:"从出生那年就飘着，童年的荡秋千，随记忆一直晃到现在，Re So So Si Do Si La，So La Si Si Si Si La Si La So，吹着前奏，望着天空，我想起花瓣，试着掉落 ，为你翘课的那一天，花落的那一天。从出生那年就飘着，童年的荡秋千，随记忆一直晃到现在，Re So So Si Do Si La，So La Si Si Si Si La Si La So，吹着前奏，望着天空，我想起花瓣，试着掉落 ，为你翘课的那一天，花落的那一天"
+        },
+        videsNews:[{
+          id:1001,
+          name:'从出生那年就飘着',
+          time:'2018-11-28'
+        },{
+          id:1002,
+          name:'童年的荡秋千',
+          time:'2018-11-28'
+        },{
+          id:1003,
+          name:'随记忆一直晃到现在',
+          time:'2018-11-28'
+        },{
+          id:1004,
+          name:'吹着前奏 望着天空',
+          time:'2018-11-28'
+        },{
+          id:1005,
+          name:'我想起花瓣 试着掉落',
+          time:'2018-11-28'
+        }],
+        docNews:[{
+          id:1001,
+          name:'从出生那年就飘着',
+          time:'2018-11-28'
+        },{
+          id:1002,
+          name:'童年的荡秋千',
+          time:'2018-11-28'
+        },{
+          id:1003,
+          name:'随记忆一直晃到现在',
+          time:'2018-11-28'
+        },{
+          id:1004,
+          name:'吹着前奏 望着天空',
+          time:'2018-11-28'
+        },{
+          id:1005,
+          name:'我想起花瓣 试着掉落',
+          time:'2018-11-28'
+        }]
+      }],
+      //学习资源推荐选项
+      learnChoiceList:[{
+        id:1001,
+        name:'JavaEE'
+      },{
+        id:1002,
+        name:'Android'
+      },{
+        id:1003,
+        name:'大数据'
+      },{
+        id:1004,
+        name:'物联网'
+      }],
+      //学习资源推荐内容
+      learnsList:[{
+        id:1001,
+        name:'朱莉',
+        ranks:'Java软件工程师',
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u115.png?raw=true',
+        num:5,
+        docList:[{
+          id:1001,
+          icon:'fa-file-word-o',
+          name:'帘外芭蕉惹邹雨',
+          time:'2018-11-30'
+        },{
+          id:1002,
+          icon:'fa-file-pdf-o',
+          name:'门环惹铜绿',
+          time:'2018-11-30'
+        },{
+          id:1003,
+          icon:'fa-file-powerpoint-o',
+          name:'而我路过那江南小镇惹了你',
+          time:'2018-11-30'
+        },{
+          id:1004,
+          icon:'fa-file-pdf-o',
+          name:'门环惹铜绿',
+          time:'2018-11-30'
+        },{
+          id:1005,
+          icon:'fa-file-powerpoint-o',
+          name:'而我路过那江南小镇惹了你',
+          time:'2018-11-30'
+        }]
+      },{
+        id:1002,
+        name:'朱莉',
+        ranks:'Java软件工程师',
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u157.png?raw=true',
+        num:5,
+        docList:[{
+          id:1001,
+          icon:'fa-file-word-o',
+          name:'帘外芭蕉惹邹雨',
+          time:'2018-11-30'
+        },{
+          id:1002,
+          icon:'fa-file-pdf-o',
+          name:'门环惹铜绿',
+          time:'2018-11-30'
+        },{
+          id:1003,
+          icon:'fa-file-powerpoint-o',
+          name:'而我路过那江南小镇惹了你',
+          time:'2018-11-30'
+        },{
+          id:1004,
+          icon:'fa-file-pdf-o',
+          name:'门环惹铜绿',
+          time:'2018-11-30'
+        },{
+          id:1005,
+          icon:'fa-file-powerpoint-o',
+          name:'而我路过那江南小镇惹了你',
+          time:'2018-11-30'
+        }]
+      },{
+        id:1003,
+        name:'朱莉',
+        ranks:'Java软件工程师',
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u136.png?raw=true',
+        num:5,
+        docList:[{
+          id:1001,
+          icon:'fa-file-word-o',
+          name:'帘外芭蕉惹邹雨',
+          time:'2018-11-30'
+        },{
+          id:1002,
+          icon:'fa-file-pdf-o',
+          name:'门环惹铜绿',
+          time:'2018-11-30'
+        },{
+          id:1003,
+          icon:'fa-file-powerpoint-o',
+          name:'而我路过那江南小镇惹了你',
+          time:'2018-11-30'
+        },{
+          id:1004,
+          icon:'fa-file-pdf-o',
+          name:'门环惹铜绿',
+          time:'2018-11-30'
+        },{
+          id:1005,
+          icon:'fa-file-powerpoint-o',
+          name:'而我路过那江南小镇惹了你',
+          time:'2018-11-30'
+        }]
+      },{
+        id:1004,
+        name:'朱莉',
+        ranks:'Java软件工程师',
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u115.png?raw=true',
+        num:5,
+        docList:[{
+          id:1001,
+          icon:'fa-file-word-o',
+          name:'帘外芭蕉惹邹雨',
+          time:'2018-11-30'
+        },{
+          id:1002,
+          icon:'fa-file-pdf-o',
+          name:'门环惹铜绿',
+          time:'2018-11-30'
+        },{
+          id:1003,
+          icon:'fa-file-powerpoint-o',
+          name:'而我路过那江南小镇惹了你',
+          time:'2018-11-30'
+        },{
+          id:1004,
+          icon:'fa-file-pdf-o',
+          name:'门环惹铜绿',
+          time:'2018-11-30'
+        },{
+          id:1005,
+          icon:'fa-file-powerpoint-o',
+          name:'而我路过那江南小镇惹了你',
+          time:'2018-11-30'
+        }]
+      },{
+        id:1005,
+        name:'朱莉',
+        ranks:'Java软件工程师',
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u157.png?raw=true',
+        num:5,
+        docList:[{
+          id:1001,
+          icon:'fa-file-word-o',
+          name:'帘外芭蕉惹邹雨',
+          time:'2018-11-30'
+        },{
+          id:1002,
+          icon:'fa-file-pdf-o',
+          name:'门环惹铜绿',
+          time:'2018-11-30'
+        },{
+          id:1003,
+          icon:'fa-file-powerpoint-o',
+          name:'而我路过那江南小镇惹了你',
+          time:'2018-11-30'
+        },{
+          id:1004,
+          icon:'fa-file-pdf-o',
+          name:'门环惹铜绿',
+          time:'2018-11-30'
+        },{
+          id:1005,
+          icon:'fa-file-powerpoint-o',
+          name:'而我路过那江南小镇惹了你',
+          time:'2018-11-30'
+        }]
+      },{
+        id:1006,
+        name:'朱莉',
+        ranks:'Java软件工程师',
+        imgUrl:'https://github.com/pluslicy/assets/blob/master/resource/首页/u136.png?raw=true',
+        num:5,
+        docList:[{
+          id:1001,
+          icon:'fa-file-word-o',
+          name:'帘外芭蕉惹邹雨',
+          time:'2018-11-30'
+        },{
+          id:1002,
+          icon:'fa-file-pdf-o',
+          name:'门环惹铜绿',
+          time:'2018-11-30'
+        },{
+          id:1003,
+          icon:'fa-file-powerpoint-o',
+          name:'而我路过那江南小镇惹了你',
+          time:'2018-11-30'
+        },{
+          id:1004,
+          icon:'fa-file-pdf-o',
+          name:'门环惹铜绿',
+          time:'2018-11-30'
+        },{
+          id:1005,
+          icon:'fa-file-powerpoint-o',
+          name:'而我路过那江南小镇惹了你',
+          time:'2018-11-30'
+        }]
+      }],
+      //合作院校
+      schoolList:['https://github.com/pluslicy/assets/blob/master/resource/首页/u336.jpg?raw=true','https://github.com/pluslicy/assets/blob/master/resource/首页/u336.jpg?raw=true','https://github.com/pluslicy/assets/blob/master/resource/首页/u336.jpg?raw=true','https://github.com/pluslicy/assets/blob/master/resource/首页/u336.jpg?raw=true','https://github.com/pluslicy/assets/blob/master/resource/首页/u336.jpg?raw=true','https://github.com/pluslicy/assets/blob/master/resource/首页/u336.jpg?raw=true','https://github.com/pluslicy/assets/blob/master/resource/首页/u336.jpg?raw=true','https://github.com/pluslicy/assets/blob/master/resource/首页/u336.jpg?raw=true','https://github.com/pluslicy/assets/blob/master/resource/首页/u336.jpg?raw=true','https://github.com/pluslicy/assets/blob/master/resource/首页/u336.jpg?raw=true']
+    }
+  },
+  computed:{
+
+  },
+  //vue实例初始化
+  created(){
+
+  },
+  //渲染完毕，挂载完毕
+  mounted(){
+
+  },
+  //事件绑定的方法
+  methods:{
+    //轮播左侧展示技术点
+    showTechnology(index){
+      console.log(22222);
+      this.technologyIndex = index;
+      $('.index .index_types>ul>li').css({
+        "background":"none",
+        "color":"white"
+      });
+      $($('.index .index_types>ul>li')[index]).css({
+        "background":"rgba(230,230,230,0.8)",
+        "color":"black"
+      });
+    },
+    hideTechnology(){
+      this.technologyIndex = 100;
+      $('.index .index_types>ul>li').css({
+        "background":"none",
+        "color":"white"
+      });
+    },
+    //【排行榜单】视频跳转，【最新动态】视频跳转
+    toVideoDetail(id){
+      //id是要查看的视频的id
+      window.open(location.origin+'/#/video/content');
+    },
+    //【排行榜单】文章跳转，【最新动态】文章跳转，【学习资源推荐】文章跳转
+    toDocDetail(id){
+      //id是要查看的文章的id
+      window.open(location.origin+'/#/doc/content');
+    },
+    //免费视频与您分享的视频的跳转
+    toFreeVideoDetail(id){
+      //id是方向的id
+      window.open(location.origin+'/#/video/content');
+    },
+    //通过轮播控制左侧列表
+    /* carouselChange(newIndex,oldIndex){
+      $('.index .index_types li').css("background","none");
+      $($('.index .index_types li')[newIndex]).css("background","#66CCFF");
+    }, */
+    //通过左侧列表控制轮播
+    /* changeCarousel(event,index){
+      $('.index .index_types li').css("background","none");
+      let $li;
+      if(event.target.tagName=='SPAN'){
+        $li = $(event.target).closest('LI');
+      }else{
+        $li = $(event.target);
+      }
+      $li.css("background","#66CCFF");
+      this.$refs.carousel.setActiveItem(index);
+    }, */
+    //用户选择不同的类别
+    changeChoice(id,index){
+      //id传递给后台
+      //index 用来改变背景颜色和字体颜色
+      $('.index .index_learn_choice span').css({
+        'backgroundColor':'#F2F2F2',
+        'color':'black'
+      });
+      $($('.index .index_learn_choice span')[index]).css({
+        'backgroundColor':'#1069FF',
+        'color':'white'
+      });
+    },
+  },  
+}
+</script>
+<style scoped>
+  .index *{
+    margin:0;
+    padding:0;
+  }
+  .index ul{
+    list-style: none;
+  }
+  .index{
+    padding-bottom:70px;
+  }
+  .index img{
+    display: block;
+  }
+  /* 设置统一的样式 */
+  .index .pointer{
+    cursor: pointer;
+  }
+  /* 轮播*/
+  .index .index_el{
+    position: relative;
+  }
+  .index .index_el-carousel img{
+    height:475px;
+    width:100%;
+  }
+  /* 轮播左侧列表 */
+  .index .index_types{
+    position: absolute;
+    z-index:10;
+    left:0;
+    top:0;
+    background-color: rgba(0,0,0,0.5);
+    height:475px;
+    font-size:16px;
+    font-weight: bold;
+    color: white;
+  }
+  .index .index_types>ul>li{
+    width:180px;
+    line-height: 45px;
+    padding:0px 25px;
+    position: relative;
+  }
+  .index .index_types>ul>li:first-child{
+    margin-top:10px;
+    background-color:'#66CCFF';
+  }
+  .index .index_types>ul>li span:nth-child(2){
+    float:right;
+  }
+  .index .index_types .index_types_detail{
+    width: 260px;
+    position: absolute;
+    left:230px;
+    top:0px;
+    background-color: rgba(230,230,230,0.8);
+    padding:10px;
+    font-size:12px;
+    line-height: 12px;
+  }
+  .index .index_types .index_types_detail>div{
+    border-bottom:1px solid #666666;
+  }
+  .index .index_types .index_types_detail>div span{
+    background-color:#666666;
+    display: inline-block;
+    padding:4px 6px;
+    color: white;
+  }
+  .index .index_types .index_types_detail li{
+    float: left;
+    padding:10px 13px 0 0;
+    color: black;
+  }
+  /* 排行榜单 */
+  /* 与其他共用 */
+  .index .index_list_title{
+    padding:30px 0 15px;
+    font-weight: 900;
+  }
+  .index .index_list_title>span:first-child{
+    font-size:28px;
+    line-height: 28px;
+    margin-right:8px;
+    /*font-weight: bold;*/
+  }
+  .index .index_list_title>span:last-child{
+    color:#666666;
+    font-size:16px;
+  }
+  .index .index_hot_list .index_list_content{
+    overflow: hidden;
+    padding-bottom:5px;
+  }
+  .index .index_hot_list .index_list_content .index_list_video{
+    float:left;
+    width: 1005px;
+  }
+  .index .index_hot_list .index_list_content .index_list_doc{
+    margin-left:1020px;
+    width: 210px;
+    box-shadow: #aaa 5px 5px 5px; 
+    border-left:1px solid #F6F6F6;
+  }
+  .index .index_hot_list .index_list_content .index_list_video >ul li{
+    width: 230px;
+    height: 185px;
+    float: left;
+    box-shadow: #aaa 5px 5px 5px; 
+    position: relative;
+  }
+  .index .index_hot_list .index_list_content .index_list_video >ul li:nth-child(2),.index .index_hot_list .index_list_content .index_list_video >ul li:nth-child(3){
+    margin-bottom: 13px;
+  }
+  .index .index_hot_list .index_list_content .index_list_video >ul li:nth-child(2),.index .index_hot_list .index_list_content .index_list_video >ul li:nth-child(4){
+    margin-right:15px;
+  }
+  .index .index_hot_list .index_list_content .index_list_video img{
+    width: 100%;
+    height: 140px;
+  }
+  .index .index_hot_list .index_list_content .index_list_video >ul li:first-child{
+    width: 515px;
+    height: 383px;
+    margin-right: 15px;
+  }
+  .index .index_hot_list .index_list_content .index_list_video >ul li:first-child img{
+    width: 100%;
+    height: 100%;
+  }
+  .index .index_list_video li:first-child>div.index_video_info{
+    position: absolute;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    width: 100%;
+    height: 45px;
+    line-height: 45px;
+    font-weight: bold;
+  }
+  .index .index_list_video li .index_video_info span:first-child{
+    color:#9C9C9C;
+  }
+  .index .index_list_video li .index_video_info>div{
+    padding:0 15px;
+    line-height: 16px;
+  }
+  .index .index_list_video li .index_video_info>div:first-child{
+    padding-top:6px;
+  }
+  .index .index_list_video li .index_video_info span:last-child{
+    float:right;
+    color:#1069FF;
+  }
+  .index .index_list_video li:first-child .index_video_info span:first-child{
+    margin-left:30px;
+    color:white;
+  }
+  .index .index_list_video li:first-child .index_video_info span:last-child{
+    float:right;
+    margin-right: 30px;
+    color:white;
+  }
+  /* 索引和开关按钮 */
+  .index .index_list_video li>div.index_video_index{
+    position: absolute;
+    left:20px;
+    top:10px;
+    color:rgba(255,255,255,0.7);
+    font-size:14px;
+    font-weight: bold;
+  }
+  .index .index_list_video li:first-child>div.index_video_index{
+    position: absolute;
+    left:25px;
+    top:15px;
+    font-size:18px;
+  }
+  .index .index_list_video li>div.index_video_play{
+    position: absolute;
+    font-size:40px;
+    line-height: 140px;
+    left:95px;
+    top:0;
+    color:rgba(255,255,255,0.7);
+  }
+  .index .index_list_video li:first-child>div.index_video_play{
+    position: absolute;
+    font-size:60px;
+    line-height: 338px;
+    left:230px;
+    top:0;
+  }
+  /* 文章榜单 */
+  /* .index .index_list_doc{
+  } */
+  .index .index_list_doc .index_doc_title{
+    background-color: #3585FE;
+    font-size:20px;
+    line-height: 38px;
+    color: white;
+    font-weight: bold;
+    padding-left:10px;
+  } 
+  .index .index_list_doc .index_doc_content li:hover{
+    background-color:rgba(240,240,240,0.5);
+  }
+  .index .index_list_doc .index_doc_content li{
+    overflow: hidden;
+    margin:5px 0;
+    padding:0 10px;
+    font-size:12px;
+    font-weight: 900;
+  }
+  .index .index_list_doc .index_doc_content .index_doc_index{
+    width:20px;
+    margin-right:10px;
+    text-align: center;
+    font-size:20px;
+    color:#666666;
+  }
+  .index .index_list_doc .index_doc_content span{
+    line-height: 38px;
+    float: left;
+  }
+  .index .index_list_doc .index_doc_content span:last-child{
+    float: right;
+    font-weight: normal;
+    color:#666666;
+  }
+  .index .index_list_doc .index_doc_content span:last-child::after{
+    clear: both;
+  }
+  .index .index_list_doc .index_doc_content img{
+    width: 20px;
+    height: 30px;
+    margin-top:4px;
+    float: left;
+  }
+  /* 免费视频教程与您分享 */
+  .index .index_free_video_list .index_list_title{
+    padding:25px 0 15px;
+    font-weight: bold;
+  }
+  .index .index_free_video_list .index_free_content ul{
+    overflow: hidden;
+  }
+  .index .index_free_video_list .index_free_content li{
+    float: left;
+    margin-left:10px;
+    padding-bottom:10px;
+  }
+  .index .index_free_video_list .index_free_content li:first-child{
+    margin-left:0;
+  }
+  .index .index_free_video_list .index_free_item:hover{
+    box-shadow: #aaa 0 0 10px;
+  }
+  .index .index_free_video_list .index_free_item img{
+    width: 240px;
+    height: 145px;
+    display: block;
+  }
+  .index .index_free_video_list .index_free_item .index_free_name{
+    border:1px solid #ccc;
+    border-top: none;
+    text-align: center;
+    line-height: 45px;
+    font-size:16px;
+    font-weight: bold;
+  }
+  /* 最新动态 */
+  .index .index_news_list .index_list_title span{
+    color:black;
+    padding:20px 0 15px;
+    font-size:28px;
+    line-height: 28px;
+  }
+  .index .index_news_list .index_news_content>ul{
+    overflow: hidden;
+  }
+  .index .index_news_list .index_news_content>ul>li{
+    width:610px;
+    float: left;
+  }
+  .index .index_news_list .index_news_content>ul>li:nth-child(odd){
+    margin-right:20px;
+  }
+  .index .index_news_list .index_news_content>ul>li .index_news_type{
+    position: relative;
+    border-bottom: 1px solid #E6E6E6;
+    color:#3585FE;
+  }
+  .index .index_news_list .index_news_content>ul>li:nth-child(2) .index_news_type{
+    color:#EC385A;
+  }
+  .index .index_news_list .index_news_content>ul>li:nth-child(3) .index_news_type{
+    color:#47A496;
+  }
+  .index .index_news_list .index_news_content>ul>li:nth-child(4) .index_news_type{
+    color:#FF9933;
+  }
+  .index .index_news_list .index_news_content>ul>li .index_news_type span{
+    display: block;
+    font-size:22px;
+    font-weight: bold;
+    width: 110px;
+    text-align: center;
+  }
+  .index .index_news_list .index_news_content>ul>li .index_news_line{
+    width: 110px;
+    height: 5px;
+    position: absolute;
+    bottom:-3px;
+    left:0;
+    background-color:#3585FE;
+    z-index:10;
+  }
+  .index .index_news_list .index_news_content>ul>li:nth-child(2) .index_news_line{
+    background-color:#EC385A;
+  }
+  .index .index_news_list .index_news_content>ul>li:nth-child(3) .index_news_line{
+    background-color:#47A496;
+  }
+  .index .index_news_list .index_news_content>ul>li:nth-child(4) .index_news_line{
+    background-color:#FF9933;
+  }
+  .index .index_news_list .index_news_doc_content{
+    overflow: hidden;
+    margin-bottom:10px;
+  }
+  .index .index_news_list .index_news_doc_content>div{
+    float:left;
+  }
+  .index .index_news_list .index_news_doc_content img{
+    width: 180px;
+    height: 110px;
+    margin-top:20px;
+  }
+  .index .index_news_list .index_news_doc_content .index_news_info{
+    height: 120px;
+    width: 410px;
+    padding-left:20px;
+    margin-top:20px;
+    padding-top:10px;
+  }
+  .index .index_news_list .index_news_info .index_news_doc_content_name{
+    font-size: 20px;
+    line-height: 20px;
+    margin-bottom:5px;
+    font-weight: bold;
+  }
+  .index .index_news_list .index_news_info .index_news_doc_content_info{
+    font-size: 12px;
+    color:#424242;
+    /* margin-bottom:2px; */
+  }
+  .index .index_news_list .index_news_info .index_news_doc_content_info span:last-child{
+    float: right;
+    margin-right:20px;
+  }
+  .index .index_news_list .index_news_info .index_news_doc_content_content{
+    font-size: 12px;
+    line-height: 20px;
+    height:58px;
+    position:relative;
+    /* text-align: justify; */
+    overflow: hidden;
+  }
+  .index .index_news_list .index_news_info .index_news_doc_content_content::after {
+    content:"...";
+    font-size: 12px;
+    line-height: 16px;
+    position:absolute;
+    bottom:0;
+    right:0;
+    background:white;
+  }
+  .index .index_news_list .index_news_video_doc{
+    overflow: hidden;
+    margin-bottom:20px;
+  }
+  .index .index_news_list .index_news_video_doc ul{
+    list-style-type: initial;
+    padding-left: 15px;
+
+  }
+  .index .index_news_list .index_news_video_doc>div{
+    float: left;
+    width: 280px;
+    position: relative;
+  }
+  .index .index_news_list .index_news_video_doc .index_news_video_list{
+    padding-right:20px;
+    border-right:2px dashed #7B7B7B;
+  }
+  .index .index_news_list .index_news_video_doc .index_news_doc_list{
+    padding-left:20px;
+  }
+  .index .index_news_list .index_news_video_doc>div>span{
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom:10px;
+  }
+  .index .index_news_list .index_news_video_doc>div li{
+    font-size: 12px;
+    line-height: 20px;
+  }
+  .index .index_news_list .index_news_video_doc>div ul span:last-child{
+    position: absolute;
+    right:20px;
+  }
+  .index .index_news_list .index_news_video_doc .index_news_doc_list ul span:last-child{
+    position: absolute;
+    right:0px;
+  }
+  /* 学习资源推荐 */
+  .index .index_learn_list .index_list_title{
+    /* margin-top:-20px; */
+    padding: 10px 0 15px;
+  }
+  .index .index_learn_list .index_list_title span:nth-child(2){
+    color:#666666;
+    font-size:16px;
+  }
+  .index .index_learn_list .index_list_title span:last-child{
+    color:#018001;
+    /* background-color: #CFE9C7; */
+    margin-left:30px;
+    padding:0 5px;
+  }
+  .index .index_learn_list .index_learn_choice span{
+    display: inline-block;
+    background-color: #F2F2F2;
+    padding:2px 16px;
+    margin-right:10px;
+    font-weight: bold;
+  }
+  .index .index_learn_list .index_learn_choice span:first-child{
+    background-color: #1069FF;
+    color:white;
+  }
+  .index .index_learn_content{
+    overflow: hidden;
+  }
+  .index .index_learn_content .index_learn_item{
+    width:400px;
+    float:left;
+    padding:20px 0;
+  }
+  .index .index_learn_content .index_learn_item:nth-child(3n+1),.index .index_learn_content .index_learn_item:nth-child(3n+2){
+    padding-right:20px;
+  }
+  .index .index_learn_content .index_learn_item:first-child,.index .index_learn_content .index_learn_item:nth-child(2),.index .index_learn_content .index_learn_item:nth-child(3){
+    border-bottom:1px solid #eee;
+  }  
+  .index .index_learn_item .learn_author_info{
+    overflow: hidden;
+    margin-bottom:15px;
+  }
+  .index .index_learn_item .learn_author_info>*{
+    float:left;
+  }
+  .index .index_learn_item .learn_author_info img{
+    width: 61px;
+    height: 61px;
+  }
+  .index .index_learn_item .learn_author_info .learn_author_name{
+    margin-left:10px;
+  }
+  .index .index_learn_item .learn_author_info .learn_author_name div:first-child{
+    font-size:16px;
+    line-height: 16px;
+    margin-top:13px;
+    font-weight: bold;
+  }
+  .index .index_learn_item .learn_author_info .learn_author_name span:first-child{
+    margin-right:5px;
+  }
+  .index .index_learn_item .learn_author_info .learn_author_name div:nth-child(2){
+    font-size:13px;
+    line-height: 13px;
+    margin-top:10px;
+    color: #747474;
+  }
+  .index .index_learn_item .learn_author_info .learn_author_num{
+    line-height: 61px;
+    float:right;
+    font-size:13px;
+    color: #747474;
+    margin-right:20px;
+  }
+  .index .index_learn_item .index_learn_doc li{
+    line-height:30px;
+  }
+  .index .index_learn_item .index_learn_doc li>span:nth-child(2){
+    margin-left:6px;
+    font-size:12px;
+  }
+  .index .index_learn_item .index_learn_doc li>span:nth-child(3){
+    float:right;
+    font-size:12px;
+  }
+  /* 合作院校 */
+  .index .index_school_list .index_list_title{
+    padding-top:10px;
+    padding-bottom: 20px;
+  }
+  .index .index_school_list .index_list_title span{
+    color:black;
+    padding:20px 0 15px;
+    font-size:28px;
+    line-height: 28px;
+  }
+  .index .index_school_list .index_school_content{
+    overflow: hidden;
+  }
+  .index .index_school_list .index_school_content .index_school_item{
+    position: relative;
+    float:left;
+    margin-right:51px;
+    margin-bottom:20px;
+  }
+  .index .index_school_list .index_school_content .index_school_item:nth-child(5n){
+    margin-right:0;
+  }
+  .index .index_school_list .index_school_content .index_school_item img,.index .index_school_list .index_school_content .index_school_item .index_school_border{
+    width: 202px;
+    height: 80px;
+    border:1px solid #DDDDDD;
+  }
+  .index .index_school_list .index_school_content .index_school_item img{
+    position:absolute;
+    top:5px;
+    left:5px;
+    box-shadow: #aaa 5px 5px 5px; 
+  }
+</style>

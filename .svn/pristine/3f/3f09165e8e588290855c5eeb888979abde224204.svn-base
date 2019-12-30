@@ -1,0 +1,140 @@
+import axios from '@/http/axios';
+export default {
+    state:{
+        // 编目数据
+        catalogue:[],
+        catalogueSecond:[],
+        // 视频数据
+        video:[],
+        // 视频详情
+        videoDetials:[],
+        // 视频id
+        videoId:''
+    },
+    getters:{
+        catalogue:state => state.catalogue,
+        catalogueSecond:state => state.catalogueSecond,
+        video:state => state.video,
+        videoDetials:state => state.videoDetials,
+        videoId:state => state.videoId,
+    },
+    mutations:{
+        // 一级编目事件
+        changeCatalogue(state,data){
+            state.catalogue = data.data.results;
+        },
+        // 二级编目事件
+        changeCatalogueSecond(state,data){
+            state.catalogueSecond = data.data.results;
+        },
+        // 视频事件
+        changeVideo(state,data){
+            state.video = data.data.results;
+        },
+        // 视频详情
+        changeVideoDetials(state,data){
+            state.videoDetials = data.data.results;
+        },
+        // 视频id
+        changeVideoId(state,data){
+            state.videoId = data.videoid;
+        }
+    },
+    actions:{
+         toVideoSave(context,param){
+              return new Promise((resolve,reject)=>{
+                  axios.post('/up_man_perres/up_videoupload/',param).then((res)=>{
+                    // console.log(res.data.results)
+                  // context.commit("changeAllZj",res.data.results)
+                  resolve(res)
+                }).catch((error)=>{
+                  reject(error)
+                })
+                })
+            },
+        // 判断是否收藏
+        isCollection(context,params){
+            // 在使用reject的时候，需要写new promise
+            return new Promise((resolve,reject)=>{
+                axios.post('/up_site_res/docsCollectCreated/',params)
+                .then(res => {
+                    resolve(res)
+                })
+                .catch(error => {
+                    reject(error)
+                })
+            })
+        },
+
+        // 判断是否点赞
+        isFavor(context,params){
+            // 在使用reject的时候，需要写new promise
+            return new Promise((resolve,reject)=>{
+                axios.post('/up_site_res/docsFavorCreated/',params)
+                .then(res => {
+                    resolve(res)
+                })
+                .catch(error => {
+                    reject(error)
+                })
+            })
+        },
+        // 视频id
+        GetVideoId(context,id){
+            return new Promise((resolve,reject)=>{   
+                context.commit("changeVideoId",id)
+            })
+        },
+        // 视频详情
+        findVideoDetials(context,params){
+            return new Promise((resolve,reject)=>{
+                axios.get('/up_site_res/videoListDetail/',params)
+                .then(res => {
+                    context.commit("changeVideoDetials",res)
+                    resolve(res)
+                })
+                .catch(err => {
+                    reject(err);
+                })
+            })
+            
+        },
+        // 获取所有视频
+        findAllVideo(context,params){
+            return new Promise((resolve,reject)=>{
+                axios.get('/up_site_res/videos/',params)
+                .then(res => {
+                    context.commit("changeVideo",res)
+                    resolve(res)
+                })
+                .catch(err => {
+                    reject(err)
+                })
+            })
+            
+        },
+        // 检索所有编目
+        findAllCatalogue(context,params){
+            // 根据后台的cata_level_num来判断，如果是1，进入第一个查询
+            // console.log(params.params.cata_level_num,'----');
+            if(params.params.cata_level_num == 1){
+                // axios中的params是vue页面的params，值是obj，意思是只查询cata_level_num为1的
+                axios.get('/up_site_res/catalogue/',params)
+                .then(res => {
+                    context.commit("changeCatalogue",res)
+                })
+                .catch(err => {
+                    reject(err)
+                })
+            }else{
+                axios.get('/up_site_res/catalogue/',params)
+                .then(res => {
+                    context.commit("changeCatalogueSecond",res)
+                })
+                .catch(err => {
+                    reject(err)
+                })
+            }
+        },
+    }
+}

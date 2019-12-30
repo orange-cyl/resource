@@ -1,0 +1,69 @@
+import axios from '@/http/axios';
+export default {
+    state:{
+        lunbo:'',
+        videoList:'',
+        docList:'',
+        RecomList:''
+    },
+    getters:{
+        lunbo:state => state.lunbo,
+        videoList:state => state.videoList,
+        docList:state => state.docList,
+        RecomList:state => state.RecomList
+    },
+    mutations:{
+        changeLunbo(state,data){
+            state.lunbo = data.data.results;
+        },
+        changeVideo(state,data){
+            state.videoList = data.data.results;
+        },
+        changeDoc(state,data){
+            state.docList = data.data.results;
+        },
+        changeRecom(state,data){
+            state.RecomList = data.data.results;
+        }
+    },
+    actions:{
+        // 轮播图
+        findLunbo(context,params){
+            axios.get('/up_site_res/wheels/',params)
+            .then(res => {
+                context.commit("changeLunbo",res)
+            })
+            .catch(err => {
+                reject(err)
+            })
+        },
+        // 视频榜单
+        findVideoList(context,params){
+            axios.get('/up_site_res/rank_video_res/',params)
+            .then(res => {
+                context.commit("changeVideo",res)
+            })
+            .catch(err => {
+
+            })
+        },
+        // 文档榜单
+        findDocList(context,params){
+            axios.get('/up_site_res/rank_docs_res/',params)
+            .then(res => {
+                context.commit("changeDoc",res)
+            })
+            .catch(err => {
+                reject(err)
+            })
+        },
+        // 学习资源推荐
+        findRecom(context,params){
+            axios.get('/up_site_res/recom_res/')
+            .then(res => {
+                context.commit('changeRecom',res)
+            })
+            .catch()
+        }
+    }
+}

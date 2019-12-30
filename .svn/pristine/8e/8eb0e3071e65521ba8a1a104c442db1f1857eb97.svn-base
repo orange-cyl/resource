@@ -1,0 +1,185 @@
+<template>
+	<div class="myVideo">
+		<div class="myVideoText">
+			<span class="background"></span>
+			<span>我的视频</span>
+			<!-- {{video}} -->
+		</div>
+		<div class="videos">
+			<div v-for="item in videos" @click="turnVideoPlay(item)">
+				<img :src=list.picUrl alt="">
+				<p>{{item.vr_name}}</p>
+				<p>{{item.vr_created_time | dateParse}}</p>
+				<span v-if="item.va !=null ">专辑</span>
+				<!-- <span v-else>专辑</span> -->
+			</div>
+		</div>
+		<div class="pageDiv">
+			 <el-pagination background @current-change="handleCurrentChange" :page-size="pagesize" layout="total, prev, pager, next" :total="total"></el-pagination>
+		</div>
+	</div>
+</template>
+<script>
+import axios from '@/http/axios';
+import {mapActions,mapGetters,mapMutations} from 'vuex';
+
+	export default {
+		
+		data(){
+			return {
+				page:1,
+		        pagesize:10,
+		        total:10,
+		        list:{
+		        	picUrl:'https://github.com/pluslicy/assets/blob/master/resource/%E4%B8%AA%E4%BA%BA%E7%A9%BA%E9%97%B4/u1871.jpg?raw=true'
+		        },
+				videos:[{
+					id:1001,
+					videoName:'JAVA基础知识',
+					data:'2018-12-10',
+					time:'04:28',
+					picUrl:'https://github.com/pluslicy/assets/blob/master/resource/%E4%B8%AA%E4%BA%BA%E7%A9%BA%E9%97%B4/u1871.jpg?raw=true',
+					flag:0
+				},{
+					id:1002,
+					videoName:'JAVA基础知识',
+					data:'2018-12-10',
+					time:'04:28',
+					picUrl:'https://github.com/pluslicy/assets/blob/master/resource/%E4%B8%AA%E4%BA%BA%E7%A9%BA%E9%97%B4/u1879.jpg?raw=true',
+					flag:1
+				},{
+					id:1003,
+					videoName:'JAVA基础知识',
+					data:'2018-12-10',
+					time:'04:28',
+					picUrl:'https://github.com/pluslicy/assets/blob/master/resource/%E4%B8%AA%E4%BA%BA%E7%A9%BA%E9%97%B4/u1879.jpg?raw=true',
+					flag:1
+				}]
+
+			}
+		},
+		//映射数据
+		computed:{
+     		...mapGetters(['video'])
+		},
+		created(){
+			
+			this.loadVideo()
+		},
+		watch:{
+		page:function(now,old) {
+	        this.loadVideo();
+	      },
+		},
+		methods:{
+      		...mapActions(['findAllVideo','GetVideoId']),
+			 /* 分页页数更改之后 */
+		      handleCurrentChange(val) {
+		        // alert(val)
+		        this.page = val
+		      },
+      		loadVideo(){
+				let form = {
+	          page:this.page,
+	          page_size:this.pagesize,
+	          user_id:24
+	        }
+			axios.get('/up_man_perres/up_videos/',{params:form}).then(r=>{
+				// console.log(r.data)
+				this.videos = r.data.results
+				// console.log(this.videos)
+			}).catch(e=>{
+
+			})
+
+			// this.findAllVideo({params:form}).then(function(){
+
+			// })
+			},
+			turnVideoPlay(item){
+				let obj ={
+		          videoid:item.id
+		        }
+		        // console.log(obj);
+		        this.GetVideoId(obj).then((r)=>{
+		        	// alert(1)	
+		        })
+		        //点击我的视频跳转到视频播放页面
+					this.$router.push("/video/content")
+				
+			}
+			
+		}
+	}
+
+</script>
+<style scoped>
+	.myVideo{
+		margin:12px 0 0 10px;
+	}
+
+	.myVideo .background{
+		width:4px;
+		height: 30px;
+		background-color: #3399FF
+	}
+	.myVideo .myVideoText{
+		display: flex;
+	}
+	.myVideo .myVideoText span:last-child{
+		font-size: 16px;
+		margin-left: 10px;
+		line-height: 33px;
+	}
+
+	.myVideo .videos{
+		display: flex;
+		flex-wrap: wrap;
+
+		/* justify-content: space-around; */
+	}
+	.myVideo .videos div{
+		width: 166px;
+		margin:10px 10px 0 0;
+		cursor: pointer;
+		position: relative;
+
+	}
+	.myVideo .videos p{
+		margin:0px;
+		padding: 0px;
+		font-size: 12px;
+	}
+
+	.myVideo .videos span{
+		font-weight: 400;
+		font-size: 12px;
+		text-align: center;	
+		color: #fff;
+		background-color: rgba(0, 0, 0, 0.7);
+		border-radius: 5px;
+		display: inline-block;
+		width: 38px;
+		height: 19px;
+		position: absolute;
+		right: 0px;
+		top: 0px
+	}
+
+	.myVideo .videos p:last-child{
+		color: #BCBCBC;
+	}
+	.myVideo .videos div img{
+		width: 166px;
+		height: 92px;
+		margin:0px;
+	}
+
+	/*分页样式*/
+	.myVideo div.pageDiv{
+		width: 500px;
+		position: absolute;
+		bottom: 30px;
+		left: 830px;
+	}
+</style>
